@@ -24,7 +24,11 @@
 
 - name: '{{ stack }} : Stack secret names (fact)'
   set_fact:
-    secret_names: "{{ secret_files.files | map(attribute='path') | map('basename') | map('regex_replace', '^(.*)\\.secret(\\.generate)?$', stack + '_\\1') | unique | list }}"
+    secret_names: >
+      {{ secret_files.files | map(attribute='path') | map('basename')
+       | map('regex_replace', '^(.*)\\.secret(\\.generate)?$', stack + '_\\1')
+       | unique | list
+      }}
 
 - name: '{{ stack }} : Stack secrets (facts)'
   set_fact:
