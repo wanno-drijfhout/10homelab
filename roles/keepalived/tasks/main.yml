@@ -9,6 +9,7 @@
     create: "yes"
     line: "ip_vs"
     path: "/etc/modules"
+    mode: 0644
 
 - name: Peer priorities known
   set_fact:
@@ -52,7 +53,8 @@
     delay: 5
     path: "{{ this.container.LogPath }}"
     # https://github.com/osixia/docker-keepalived/blob/master/image/service/keepalived/assets/notify.sh
-    search_regex: "(?P<state>I'm the MASTER! Whup whup\\.|Ok, i'm just a backup, great\\.(?![\\s\\S]+I'm the MASTER! Whup whup\\.)|Fault, what \\?|Unknown state)"
+    search_regex: >
+      (?P<state>I'm the MASTER! Whup whup\\.|Ok, i'm just a backup, great\\.(?![\\s\\S]+I'm the MASTER! Whup whup\\.)|Fault, what \\?|Unknown state)
     timeout: 6
   register: waitfor
 - name: Peer states shown

@@ -27,7 +27,7 @@
   copy:
     dest: "/tmp/swarm_join_tokens.json"
     content: "{{ SWARM_FACTS.JoinTokens | to_nice_json }}"
-    
+
 - name: Swarm join tokens fetched
   when: "SWARM_SHARED_IP in ansible_facts.all_ipv4_addresses"
   fetch:

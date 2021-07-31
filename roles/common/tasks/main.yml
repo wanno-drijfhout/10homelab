@@ -11,7 +11,7 @@
   lineinfile:
     dest: /etc/hosts
     regexp: '.*{{ item }}$'
-    line: "{{ hostvars[item].ansible_host }} {{item}}.{{DOMAIN}} {{item}}"
+    line: "{{ hostvars[item].ansible_host }} {{ item }}.{{ DOMAIN }} {{ item }}"
     state: present
     backup: true
   when: "hostvars[item].ansible_host is defined"

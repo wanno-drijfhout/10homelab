@@ -3,7 +3,7 @@
   pip:
     executable: pip3
     name:
-    - docker 
+    - docker
     - jsondiff
 
 - name: Required system packages installed

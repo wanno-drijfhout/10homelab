@@ -5,11 +5,12 @@
     name: "{{ stack }}"
     state: absent
     absent_retries: 10
-    
+
 - name: '{{ stack }} : Stack files copied'
   copy:
     src: "Stacks/{{ stack }}/"
     dest: "Stacks/{{ stack }}"
+    mode: 0640
 
 - name: '{{ stack }} : Stack secret files found'
   find:
@@ -41,6 +42,7 @@
   template:
     src: "{{ item }}"
     dest: "{{ item | splitext | first }}" # Remove the .j2 extension
+    mode: 0640
     force: yes
     # Also, you can override jinja2 settings by adding a special header to template file. i.e.
     #
@@ -49,7 +51,7 @@
     # which changes the variable interpolation markers to [% var %] instead of {{ var }}.
     # This is the best way to prevent evaluation of things that look like, but should not be Jinja2.
   with_items: "{{ template_files.files | map(attribute='path') | list }}"
-  
+
 - name: '{{ stack }} : Stack secret absent'
   docker_secret:
     name: "{{ item }}"
@@ -79,7 +81,7 @@
 
 - name: '{{ stack }} : Stack URL'
   set_fact:
-    stack_url: "https://{{stack}}.{{DOMAIN}}"
+    stack_url: "https://{{ stack }}.{{ DOMAIN }}"
 
 - name: '{{ stack }} : Stack await online'
   uri:

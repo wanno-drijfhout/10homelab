@@ -22,7 +22,7 @@
 
 - name: Temporary file system for temporary directories
   mount:
-    path: "{{item}}"
+    path: "{{ item }}"
     src: tmpfs
     state: mounted
     fstype: tmpfs
@@ -41,21 +41,22 @@
 
 - name: Distributed directory exists
   file:
-    path: "/mnt/distributed{{item}}"
+    path: "/mnt/distributed{{ item }}"
     state: directory
-    #mode: '0755'  
-  with_items: 
+    mode: 0750
+  with_items:
   - "/var/lib/docker/volumes"
   - "/var/lib/docker/image"
 
-- name: Distributed directory '{{item}}' bound
+- name: Distributed directory '{{ item }}' bound
   mount:
     path: "{{item}}"
-    src: "/mnt/distributed{{item}}"
+    src: "/mnt/distributed{{ item }}"
+    mode: 0750
     opts: bind
     state: mounted
     fstype: bind
-  with_items: 
+  with_items:
   - "/var/lib/docker/volumes"
   - "/var/lib/docker/image"
   

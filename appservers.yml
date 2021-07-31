@@ -2,15 +2,15 @@
 - hosts: appservers
   roles:
     - common
-    - docker-storage
-    - docker-engine
+    - docker_storage
+    - docker_engine
     - keepalived
     - dns
-    - docker-swarm
+    - docker_swarm
   tasks:
-    - name: docker-stacks
+    - name: docker_stacks
       include_role:
-        name: docker-stacks
+        name: docker_stacks
       loop: "{{ STACKS }}"
       loop_control:
         loop_var: stack
