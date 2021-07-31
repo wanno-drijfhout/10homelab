@@ -1,25 +1,4 @@
 ---
-# - name: Known disks determined
-#   command:
-#     cmd: 'lsblk --json'
-#   result: lsblk
-
-# - name: Unused disks determined
-#   set_fact:
-#     unused_disks: '{{ lsblk | json_query(query) }}'
-#   vars:
-#     query: "blockdevices[?(@.children==null && @.type==`disk`)]"
-
-# - with_items: unused_disks
-#   block:
-#   - name: "{{ item }} : Disk mounted"
-#     mount:
-#       src: "/dev/{{item}}"
-#       path: "/data/{{item}}"
-#       state: mounted
-#       fstype: none
-#       #fstype: ext4
-
 - name: Temporary file system for temporary directories
   mount:
     path: "{{ item }}"
@@ -35,6 +14,7 @@
   mount:
     src: "/dev/sdb1"
     path: "/mnt/distributed"
+    mode: 0750
     state: mounted
     fstype: ext4
     opts: defaults
@@ -50,7 +30,7 @@
 
 - name: Distributed directory '{{ item }}' bound
   mount:
-    path: "{{item}}"
+    path: "{{ item }}"
     src: "/mnt/distributed{{ item }}"
     mode: 0750
     opts: bind
@@ -59,4 +39,3 @@
   with_items:
   - "/var/lib/docker/volumes"
   - "/var/lib/docker/image"
-  
