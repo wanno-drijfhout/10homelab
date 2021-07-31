@@ -1,0 +1,28 @@
+all:
+  vars:
+    #Ensure ansible is install via pip3 to get the python3 interpreter.
+    ansible_python_interpreter: /usr/bin/python3
+    ADMIN_EMAIL: <<INSERT YOUR ADMIN ADDRESS>
+    DOMAIN: <<example.org>>
+    DOMAIN_CIDR: 10.<<XX>>.0.0/16
+    GATEWAY_IP: 10.<<XX>>.1.1
+    LOCATION: <<City>>
+  children:
+    hardware:
+      hosts:
+        <<hypervisor-hostname>>:
+          ansible_host: 10.<<XX>>.1.<<YY>>
+    appservers:
+      vars:
+        SWARM_SHARED_IP: 10.<<XX>>.<<YY>>.255
+        STACKS:
+        - traefik
+        - static
+        - whoami
+        - pihole
+        - portainer
+        - organizr
+        - nextcloud
+      hosts:
+        <<app-server-hostname>>:
+          ansible_host: 10.<<XX>>.<<YY>>.1

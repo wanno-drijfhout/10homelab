@@ -1,0 +1,47 @@
+---
+- name: Required Python modules installed (needed for Ansible)
+  pip:
+    executable: pip3
+    name:
+    - docker 
+    - jsondiff
+
+- name: Required system packages installed
+  apt:
+    name:
+    - apt-transport-https
+    - ca-certificates
+    - gnupg
+    - lsb-release
+
+- name: Docker repository GPG key accepted
+  apt_key:
+    url: https://download.docker.com/linux/ubuntu/gpg
+
+- name: Docker repository GPG key installed
+  apt_repository:
+    repo: deb [arch=amd64] https://download.docker.com/{{ ansible_system | lower }}/{{ ansible_distribution | lower }} {{ ansible_distribution_release }} stable
+
+- name: Required docker packages installed
+  apt:
+    update_cache: yes
+    name:
+    - docker-ce
+    - docker-ce-cli
+    - containerd.io
+
+- name: Docker running at boot
+  service:
+    name: docker
+    state: started
+    enabled: yes
+
+- name: Docker is working (hello world)
+  docker_container:
+    name: hello-world
+    image: hello-world
+    detach: false
+    cleanup: true
+  register: this
+  changed_when: false
+  failed_when: "'Hello from Docker!' not in this.container.Output"

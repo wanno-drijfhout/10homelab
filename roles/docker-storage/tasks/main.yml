@@ -1,0 +1,61 @@
+---
+# - name: Known disks determined
+#   command:
+#     cmd: 'lsblk --json'
+#   result: lsblk
+
+# - name: Unused disks determined
+#   set_fact:
+#     unused_disks: '{{ lsblk | json_query(query) }}'
+#   vars:
+#     query: "blockdevices[?(@.children==null && @.type==`disk`)]"
+
+# - with_items: unused_disks
+#   block:
+#   - name: "{{ item }} : Disk mounted"
+#     mount:
+#       src: "/dev/{{item}}"
+#       path: "/data/{{item}}"
+#       state: mounted
+#       fstype: none
+#       #fstype: ext4
+
+- name: Temporary file system for temporary directories
+  mount:
+    path: "{{item}}"
+    src: tmpfs
+    state: mounted
+    fstype: tmpfs
+    opts: size=2048m
+  with_items:
+  - "/var/lib/docker/tmp"
+  - "/tmp"
+
+- name: Distributed storage mounted
+  mount:
+    src: "/dev/sdb1"
+    path: "/mnt/distributed"
+    state: mounted
+    fstype: ext4
+    opts: defaults
+
+- name: Distributed directory exists
+  file:
+    path: "/mnt/distributed{{item}}"
+    state: directory
+    #mode: '0755'  
+  with_items: 
+  - "/var/lib/docker/volumes"
+  - "/var/lib/docker/image"
+
+- name: Distributed directory '{{item}}' bound
+  mount:
+    path: "{{item}}"
+    src: "/mnt/distributed{{item}}"
+    opts: bind
+    state: mounted
+    fstype: bind
+  with_items: 
+  - "/var/lib/docker/volumes"
+  - "/var/lib/docker/image"
+  

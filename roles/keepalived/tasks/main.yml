@@ -1,0 +1,65 @@
+---
+# TODO explore more swarmified alternative: https://hub.docker.com/r/lolhens/keepalived-swarm
+
+- name: IPVS kernel module enabled
+  modprobe:
+    name: ip_vs
+- name: IPVS kernel module installed
+  lineinfile:
+    create: "yes"
+    line: "ip_vs"
+    path: "/etc/modules"
+
+- name: Peer priorities known
+  set_fact:
+    KEEPALIVED_PRIORITY: "{{ 200 | random(seed=inventory_hostname) }}"
+
+- name: Peer priorities shown
+  debug:
+    msg: "Host {{ ansible_host }} has priority {{ KEEPALIVED_PRIORITY }} to claim {{ SWARM_SHARED_IP }}"
+
+- name: Keepalived password randomized
+  set_fact:
+    KEEPALIVED_PASSWORD: "{{ lookup('password', '/etc/keepalived_password chars=ascii_letters,digits,punctuation') }}"
+
+- name: Swarm drones
+  set_fact:
+    SWARM_DRONE_IPS: "{{ groups['appservers'] | map('extract', hostvars, ['ansible_host']) | join(',') }}"
+- name: Swarm drone IPs
+  debug:
+    msg: "{{ SWARM_DRONE_IPS }}"
+
+- name: Container 'keepalived' is running
+  docker_container:
+    name: keepalived
+    image: osixia/keepalived:2.0.20
+    restart_policy: unless-stopped
+    # restart: yes
+    # recreate: yes
+    network_mode: host
+    capabilities: [NET_ADMIN, NET_BROADCAST, NET_RAW]
+    env:
+      KEEPALIVED_INTERFACE: "ens18"
+      KEEPALIVED_VIRTUAL_IPS: "{{ SWARM_SHARED_IP }}"
+      KEEPALIVED_UNICAST_PEERS: "#PYTHON2BASH:{{ SWARM_DRONE_IPS | difference( [ansible_host] ) }}"
+      KEEPALIVED_PASSWORD: "{{ KEEPALIVED_PASSWORD }}"
+      KEEPALIVED_PRIORITY: "{{ KEEPALIVED_PRIORITY }}"
+    healthcheck:
+      test: "ping -c3 {{ SWARM_SHARED_IP }}"
+  register: this
+- name: Peer states known
+  wait_for:
+    delay: 5
+    path: "{{ this.container.LogPath }}"
+    # https://github.com/osixia/docker-keepalived/blob/master/image/service/keepalived/assets/notify.sh
+    search_regex: "(?P<state>I'm the MASTER! Whup whup\\.|Ok, i'm just a backup, great\\.(?![\\s\\S]+I'm the MASTER! Whup whup\\.)|Fault, what \\?|Unknown state)"
+    timeout: 6
+  register: waitfor
+- name: Peer states shown
+  debug:
+    msg: "State: {{ waitfor['match_groupdict']['state'] }}"
+
+- name: Shared IP pingable
+  command:
+    cmd: "ping -c3 {{ SWARM_SHARED_IP }}"
+  changed_when: false

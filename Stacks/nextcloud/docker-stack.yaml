@@ -1,0 +1,118 @@
+version: '3.6'
+
+services:
+  app:
+    image: nextcloud
+    volumes:
+      - default:/var/www/html
+      - data:/var/www/html/data
+    networks:
+      - default
+      - proxy
+    secrets:
+      - admin_user
+      - admin_password
+      - db_file
+      - db_user
+      - db_password
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+      labels:
+        - "traefik.http.routers.nextcloud-app.entrypoints=https,https-ext"
+        - "traefik.http.services.nextcloud-app.loadbalancer.server.port=80"
+        # traefik.frontend.redirect.permanent: 'true'
+        # traefik.frontend.redirect.regex: https://(.*)/.well-known/(card|cal)dav
+        # traefik.frontend.redirect.replacement: https://$$1/remote.php/dav/
+        # Middleware cloud-dav replaces .well-known paths for caldav and carddav with proper nextcloud path
+        - "traefik.http.middlewares.nextcloud-dav.replacepathregex.regex=^/.well-known/(card|cal)dav"
+        - "traefik.http.middlewares.nextcloud-dav.replacepathregex.replacement=/remote.php/dav/"
+        #- "traefik.http.middlewares.nextcloud-dav.replacepathregex.permanent=true"
+        #- "traefik.http.middlewares.nextcloud-wellknown.replacepathregex.regex=^(/.well-known.*)"
+        #- "traefik.http.middlewares.nextcloud-wellknown.replacepathregex.replacement=/index.php$${1}"
+        #- "traefik.http.routers.nextcloud-app.middlewares=nextcloud-dav, nextcloud-wellknown, static-app-errorpages"
+        - "traefik.http.routers.nextcloud-app.middlewares=nextcloud-dav,static-app-errorpages"
+    environment:
+      - TRUSTED_PROXIES=${DOMAIN_CIDR}
+      - APACHE_DISABLE_REWRITE_IP=1
+      - "NEXTCLOUD_TRUSTED_DOMAINS=localhost nextcloud.${DOMAIN}"
+      - NEXTCLOUD_ADMIN_PASSWORD_FILE=/run/secrets/admin_password
+      - NEXTCLOUD_ADMIN_USER_FILE=/run/secrets/admin_user
+      - POSTGRES_HOST=db
+      - POSTGRES_DB_FILE=/run/secrets/db_file
+      - POSTGRES_USER_FILE=/run/secrets/db_user
+      - POSTGRES_PASSWORD_FILE=/run/secrets/db_password
+      - REDIS_HOST=redis
+      #- REDIS_HOST_PORT=6379
+      #- REDIS_HOST_PASSWORD_FILE=
+      - PHP_UPLOAD_LIMIT='5G'
+      #- APACHE_DISABLE_REWRITE_IP=1
+      # SMTP/MAIL...  https://github.com/nextcloud/docker
+      #- TRUSTED_PROXIES
+      # default_phone_region  # https://github.com/nextcloud/docker/issues/1465
+    depends_on:
+      - db
+      - redis
+
+  db:
+    image: postgres
+    networks:
+      - default
+    volumes:
+      - db:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB_FILE=/run/secrets/db_file
+      - POSTGRES_USER_FILE=/run/secrets/db_user
+      - POSTGRES_PASSWORD_FILE=/run/secrets/db_password
+    secrets:
+      - db_file
+      - db_user
+      - db_password
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.platform.os == linux
+      labels:
+        - "traefik.enable=false"
+  
+  redis:
+    image: redis:alpine
+    networks:
+      - default
+    volumes:
+      - redis:/data
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.platform.os == linux
+      labels:
+        - "traefik.enable=false"
+
+secrets:
+  admin_user:
+    file: admin_user.secret
+  admin_password:
+    file: admin_password.secret
+  db_file: # database name
+    file: db_file.secret
+  db_user:
+    file: db_user.secret
+  db_password:
+    file: db_password.secret
+
+volumes:
+  default:
+  data:
+  db:
+  redis:
+
+networks:
+  default:
+  proxy:
+    name: proxy
+    external: true
+

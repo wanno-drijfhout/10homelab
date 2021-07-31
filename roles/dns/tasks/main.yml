@@ -1,0 +1,32 @@
+---
+
+- name: DNSStubListener disabled
+  lineinfile:
+    dest: /etc/systemd/resolved.conf
+    line: "DNSStubListener=no"
+    backup: true
+
+- name: DNS resolved configured for localhost
+  lineinfile:
+    dest: /etc/systemd/resolved.conf
+    line: "DNS=127.0.0.1"
+    backup: true
+
+- name: DNS resolved configured for fallback
+  lineinfile:
+    dest: /etc/systemd/resolved.conf
+    line: "FallbackDNS=10.69.1.1"
+    backup: true
+
+- name: Set resolve.conf
+  file:
+    src: /run/systemd/resolve/resolv.conf
+    dest: /etc/resolv.conf
+    force: yes
+    state: link
+
+- name: Systemd-resolved stopped
+  service:
+    name: systemd-resolved
+    enabled: no
+    state: stopped

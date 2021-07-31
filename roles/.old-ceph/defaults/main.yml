@@ -1,0 +1,3 @@
+---
+CEPH_CONFIG_DIR: /etc/ceph
+VOLUME_NAME: drone-data-volume

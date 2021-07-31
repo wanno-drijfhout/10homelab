@@ -1,0 +1,29 @@
+---
+- name: Message of the Day set
+  template:
+    src: motd.j2
+    dest: /etc/motd
+    owner: root
+    group: root
+    mode: 0644
+
+- name: Hosts aliases defined
+  lineinfile:
+    dest: /etc/hosts
+    regexp: '.*{{ item }}$'
+    line: "{{ hostvars[item].ansible_host }} {{item}}.{{DOMAIN}} {{item}}"
+    state: present
+    backup: true
+  when: "hostvars[item].ansible_host is defined"
+  with_items: "{{ hostvars }}"
+
+- name: Unattended updates installed
+  apt:
+    name: unattended-upgrades
+    update_cache: true
+
+- name: Required system packages installed
+  apt:
+    name:
+    - python3-pip
+    - python3-jmespath

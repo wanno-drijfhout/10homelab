@@ -1,0 +1,27 @@
+version: '3.6'
+services:
+  app:
+    image: organizr/organizr
+    # environment:
+    #   - PUID=1000
+    #   - PGID=1000
+    volumes:
+      - default:/config
+    networks:
+      - proxy
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+      labels:
+        - "traefik.http.routers.organizr-app.entrypoints=https"
+        - "traefik.http.services.organizr-app.loadbalancer.server.port=80"
+
+networks:
+  proxy:
+    name: proxy
+    external: true
+    
+volumes:
+  default:

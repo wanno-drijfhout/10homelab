@@ -1,0 +1,118 @@
+---
+- name: Create configuration directory
+  file:
+    path: "{{ CEPH_CONFIG_DIR }}"
+    state: directory
+
+- name: Tool 'cephadm' downloaded
+  uri:
+    url: https://github.com/ceph/ceph/raw/octopus/src/cephadm/cephadm
+    dest: "/usr/bin/cephadm"
+    mode: 0750
+    creates: "/usr/bin/cephadm"
+    
+- name: Ceph-common installed
+  command:
+    cmd: "cephadm install ceph-common"
+    creates: "/usr/bin/ceph"
+
+- name: Cluster bootstrapped (on master node)
+  when: "SWARM_SHARED_IP in ansible_facts.all_ipv4_addresses"
+  command:
+    cmd: "cephadm bootstrap --mon-ip {{ ansible_host }}"
+    creates: "{{CEPH_CONFIG_DIR}}/ceph.conf"
+  register: this
+  failed_when: "this.rc != 0 and 'already exists' not in this.stderr"
+
+- name: Cluster configuration fetched (from master node)
+  when: "SWARM_SHARED_IP in ansible_facts.all_ipv4_addresses"
+  fetch:
+    src: "{{ CEPH_CONFIG_DIR }}/ceph.conf"
+    dest: "/tmp/ansible{{ CEPH_CONFIG_DIR }}/"
+    flat: yes
+
+- name: Cluster admin keyring fetched (from master node)
+  when: "SWARM_SHARED_IP in ansible_facts.all_ipv4_addresses"
+  fetch:
+    src: "{{ CEPH_CONFIG_DIR }}/ceph.client.admin.keyring"
+    dest: "/tmp/ansible{{ CEPH_CONFIG_DIR }}/"
+    flat: yes
+
+- name: Cluster public key fetched (from master node)
+  when: "SWARM_SHARED_IP in ansible_facts.all_ipv4_addresses"
+  fetch:
+    src: "{{ CEPH_CONFIG_DIR }}/ceph.pub"
+    dest: "/tmp/ansible{{ CEPH_CONFIG_DIR }}/"
+    flat: yes
+
+- name: Cluster configuration spread (to non-master nodes)
+  when: "SWARM_SHARED_IP not in ansible_facts.all_ipv4_addresses"
+  copy:
+    src: "/tmp/ansible{{ CEPH_CONFIG_DIR }}/"
+    dest: "{{ CEPH_CONFIG_DIR }}/"
+
+- name: Public key appended
+  authorized_key:
+    user: root
+    key: "{{ lookup('file', '/tmp/ansible{{CEPH_CONFIG_DIR}}/ceph.pub' ) }}"
+
+- name: Cluster nodes added (on master node)
+  when: "SWARM_SHARED_IP in ansible_facts.all_ipv4_addresses"
+  command:
+    cmd: "ceph orch host add {{ item }}"
+  loop: "{{ ansible_play_hosts | difference([inventory_hostname]) }}"
+
+- name: Cluster storage added
+  command:
+    cmd: "ceph orch apply osd --all-available-devices"
+    
+- name: Cluster volume created
+  when: "SWARM_SHARED_IP in ansible_facts.all_ipv4_addresses"
+  command:
+    cmd: "ceph fs volume create {{ VOLUME_NAME }}"
+
+- name: Cluster volume created and active
+  command:
+    cmd: "ceph fs volume ls"
+  register: this
+  failed_when: 'VOLUME_NAME not in this.stdout'
+  retries: 20
+  delay: 5
+
+- name: Cluster client key known
+  command:
+    cmd: "ceph-authtool -p /etc/ceph/ceph.client.admin.keyring"
+  register: CEPH_SECRET
+
+- name: Create mount for volume
+  mount:
+    src: "{{ ansible_play_hosts | join(',') }}:/"
+    fstype: ceph
+    opts: "name=admin,secret={{ CEPH_SECRET.stdout }},noatime,_netdev"
+    path: "/var/{{ VOLUME_NAME }}"
+    state: mounted
+
+- name: Random password for 'root' exists
+  when: "SWARM_SHARED_IP in ansible_facts.all_ipv4_addresses"
+  copy:
+    content: "{{ lookup('password', '~/ceph-web-dashboard') }}"
+    dest: "/tmp/ceph-web-dashboard"
+    mode: 0760
+- name: Ceph web dashboard is enabled for 'root'
+  when: "SWARM_SHARED_IP in ansible_facts.all_ipv4_addresses"
+  command:
+    cmd: "ceph dashboard ac-user-create root administrator -i /tmp/ceph-web-dashboard"
+  #register: CEPH_WEB_DASHBOARD_USER
+
+- name: Ceph web dashboard is only accessible on localhost
+  when: "SWARM_SHARED_IP in ansible_facts.all_ipv4_addresses"
+  command:
+    cmd: "ceph config set mgr mgr/dashboard/server_addr 0.0.0.0"
+- name: Ceph web dashboard is only accessible on secure port
+  when: "SWARM_SHARED_IP in ansible_facts.all_ipv4_addresses"
+  command:
+    cmd: "ceph config set mgr mgr/dashboard/server_port 8443"
+- name: Ceph web dashboard is not accessible on standby nodes
+  when: "SWARM_SHARED_IP in ansible_facts.all_ipv4_addresses"
+  command:
+    cmd: "ceph config set mgr mgr/dashboard/standby_behaviour redirect"

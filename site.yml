@@ -1,0 +1,3 @@
+---
+- import_playbook: hardware.yml
+- import_playbook: appservers.yml

@@ -1,0 +1,70 @@
+---
+- name: Swarm detected if existing
+  docker_swarm_info:
+  ignore_errors: yes
+  register: existing_swarm
+- name: Swarm detected if existing (facts)
+  when: "existing_swarm is not skipped and existing_swarm is succeeded"
+  set_fact:
+    SWARM_FACTS: "{{ existing_swarm.swarm_facts }}"
+
+- name: Swarm initialized if not existing
+  when:
+  - "SWARM_SHARED_IP in ansible_facts.all_ipv4_addresses"
+  - "not existing_swarm.docker_swarm_active"
+  docker_swarm:
+    advertise_addr: "{{ ansible_host }}:2377"
+    listen_addr: "0.0.0.0:2377"
+    state: present
+  register: new_swarm
+- name: Swarm initialized if not existing (facts)
+  when: "new_swarm is not skipped and new_swarm is succeeded"
+  set_fact:
+    SWARM_FACTS: "{{ new_swarm.swarm_facts }}"
+
+- name: Swarm join tokens exported
+  when: "SWARM_SHARED_IP in ansible_facts.all_ipv4_addresses"
+  copy:
+    dest: "/tmp/swarm_join_tokens.json"
+    content: "{{ SWARM_FACTS.JoinTokens | to_nice_json }}"
+    
+- name: Swarm join tokens fetched
+  when: "SWARM_SHARED_IP in ansible_facts.all_ipv4_addresses"
+  fetch:
+    src: "/tmp/swarm_join_tokens.json"
+    dest: "/tmp/swarm_join_tokens.json"
+    flat: yes
+
+- name: Swarm join tokens imported
+  when: "SWARM_SHARED_IP not in ansible_facts.all_ipv4_addresses"
+  include_vars:
+    file: "/tmp/swarm_join_tokens.json"
+    name: "SWARM_JOIN_TOKENS"
+
+- name: Swarm joined as managers
+  when:
+  - "SWARM_SHARED_IP not in ansible_facts.all_ipv4_addresses"
+  - "not existing_swarm.docker_swarm_manager"
+  docker_swarm:
+    advertise_addr: "{{ ansible_host }}:2377"
+    remote_addrs: "{{ SWARM_SHARED_IP }}"
+    join_token: "{{ SWARM_JOIN_TOKENS.Manager }}"
+    listen_addr: "0.0.0.0:2377"
+    state: join
+
+- name: Swarm node labels set
+  docker_node:
+    hostname: "{{ inventory_hostname }}"
+    labels:
+      DOMAIN: "{{ DOMAIN }}"
+      INVENTORY: "{{ inventory_dir | basename }}"
+
+- name: Proxy network established
+  docker_network:
+    name: proxy
+    appends: true
+    attachable: true
+    scope: swarm
+    driver: overlay
+    ipam_config:
+      - subnet: 10.69.80.0/24
