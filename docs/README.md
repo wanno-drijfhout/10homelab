@@ -2,6 +2,13 @@
 
 The "10homelab" project configures a home server, sufficiently secure and maintainable for personal use.
 
+See our documentation on:
+
+- [Introduction](./introduction.md)
+- [Installing hypervisor](./proxmox.md)
+- [Hardware management](./hardware.md)
+- [Administration](./administration.md)
+
 ## Features
 
 - Deployment automation **Ansible**
@@ -34,10 +41,3 @@ For further reading, check out:
 - [r/Homelab](https://www.reddit.com/r/homelab/)
 - [Funky Penguin](https://geek-cookbook.funkypenguin.co.nz/)
 - [Test voor moderne Internetstandaarden](https://internet.nl/)
-
-## Documentation
-
-- [Introduction](./introduction.md)
-- [Installing hypervisor](./proxmox.md)
-- [Hardware management](./hardware.md)
-- [Administration](./administration.md)
