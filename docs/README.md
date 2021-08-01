@@ -32,7 +32,7 @@ We balance the following principles:
 - Reasonably **secure**
   - auto-generated admin-accounts, no security hacks, but no active hardening
 - Reasonably **stable**
-  - separate inventories trust automatic upgrades
+  - separate inventories per stage (stable, experimental), trust automatic upgrades
 
 ## Inspiration & resources
 
