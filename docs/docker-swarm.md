@@ -33,14 +33,14 @@ Ensure the values correspond to the inventory file!
 Open the noVNC terminal and install Ubuntu server.
 
 - Configure IPv4:
-  - Subnet: `10.69.0.0/16`
-  - Address: `10.69.10.0`
-  - Gateway: `10.69.1.1`
-  - Name servers: `10.69.1.1`
-  - Search domains: `keizerlijk.eu`
+  - Subnet: `10.<<XX>>.0.0/16`
+  - Address: `10.<<XX>>.10.0`
+  - Gateway: `10.<<XX>>.1.1`
+  - Name servers: `10.<<XX>>.1.1`
+  - Search domains: `<<example.org>>`
 - Profile setup
   - Your name: `New user`
-  - Your server's name: `drone-0`
+  - Your server's name: `app-stable-1`
   - Username: `newuser`
   - Password: `newuser`
 - Install OpenSSH server
