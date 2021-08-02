@@ -1,0 +1,124 @@
+---
+- name: '{{ stack }} : Authenticate'
+  uri:
+    url: '{{ stack_url }}/api/auth'
+    method: POST
+    return_content: true
+    body_format: json
+    body: 
+      Username: admin
+      Password: '{{ portainer_admin_password }}'
+  register: auth_token
+
+## Tags
+
+- name: '{{ stack }} : Get tags'
+  uri:
+    url: '{{ stack_url }}/api/tags'
+    method: GET
+    return_content: true
+    headers:
+      Authorization: 'Bearer {{ auth_token.json.jwt }}'
+  register: tags
+
+- name: '{{ stack }} : Find tag for domain'
+  set_fact:
+    tag_ids: '{{ tags | json_query(query) }}'
+  vars:
+    query: "json[?(@.Name==`{{ DOMAIN }}`)].ID"
+
+- when: not tag_ids
+  block:
+  - name: '{{ stack }} : Post tag'
+    uri:
+      url: '{{ stack_url }}/api/tags'
+      method: POST
+      return_content: true
+      body_format: json
+      body:
+        name: '{{ DOMAIN }}'
+      headers:
+        Authorization: 'Bearer {{ auth_token.json.jwt }}'
+    register: post_tag
+
+  - name: '{{ stack }} : Set new tag for domain'
+    set_fact:
+      tag_ids: ['{{ post_tag.json.ID }}']
+
+## Endpoints
+  
+- name: '{{ stack }} : Get endpoint groups'
+  uri:
+    url: '{{ stack_url }}/api/endpoint_groups'
+    method: GET
+    return_content: true
+    headers:
+      Authorization: 'Bearer {{ auth_token.json.jwt }}'
+  register: endpoint_groups
+  
+- name: '{{ stack }} : Find endpoint group for domain'
+  set_fact:
+    endpoint_group_ids: '{{ endpoint_groups | json_query(query) }}'
+  vars:
+    query: "json[?(@.Name==`{{ inventory_dir | basename }}`)].Id"
+
+- when: (endpoint_group_ids | count) == 0
+  block:
+  - name: '{{ stack }} : Post endpoint group'
+    uri:
+      url: '{{ stack_url }}/api/endpoint_groups'
+      method: POST
+      return_content: true
+      body_format: json
+      body:
+        name: '{{ inventory_dir | basename }}'
+      headers:
+        Authorization: 'Bearer {{ auth_token.json.jwt }}'
+    register: post_endpoint_group
+  - name: '{{ stack }} : Set ID for new endpoint group for domain'
+    set_fact:
+      endpoint_group_ids: ['{{ post_endpoint_group.json.Id }}']
+
+## Endpoints
+  
+- name: '{{ stack }} : Get endpoints'
+  uri:
+    url: '{{ stack_url }}/api/endpoints'
+    method: GET
+    return_content: true
+    headers:
+      Authorization: 'Bearer {{ auth_token.json.jwt }}'
+  register: endpoints
+
+
+- name: '{{ stack }} : Find endpoint for host'
+  set_fact:
+    endpoint_ids: '{{ endpoints | json_query(query) }}'
+  vars:
+    query: "json[?(@.URL==`tcp://tasks.agent:9001`)].Id"
+  failed_when: (endpoint_ids | length) != 1
+
+- name: '{{ stack }} : Update endpoint'
+  uri:
+    url: '{{ stack_url }}/api/endpoints/{{ endpoint_ids | first }}'
+    method: PUT     # Sort of works like PATCH (Json Merge patch)
+    return_content: true
+    body_format: json
+    body:
+      name: '{{ DOMAIN }}'
+      publicURL: '{{ DOMAIN }}'
+      tagIDs: '{{ tag_ids }}'
+      #groupID: '{{ endpoint_group_ids | first }}' # THIS DOES *NOT* WORK; use the separate API call!
+    headers:
+      Authorization: 'Bearer {{ auth_token.json.jwt }}'
+  register: endpoint
+  
+- name: '{{ stack }} : Assign endpoint to group'
+  uri:
+    url: '{{ stack_url }}/api/endpoint_groups/{{endpoint_group_ids | first}}/endpoints/{{ endpoint_ids | first }}'
+    status_code: 204
+    method: PUT
+    return_content: true
+    headers:
+      Authorization: 'Bearer {{ auth_token.json.jwt }}'
+  
