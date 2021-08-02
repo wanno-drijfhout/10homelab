@@ -10,14 +10,14 @@
     mode: 0755
   register: copied
 
-- when: not copied.changed
+- when: not copied.changed                                            # noqa 503
   name: '{{ stack }} : Stack await online'
   uri:
     url: "{{ stack_url }}"
   ignore_errors: yes
   register: online
 
-- when: copied.changed or online.failed
+- when: copied.changed or online.failed                               # noqa 503
   block:
   # Pruning stacks is necessary to update config files and secrets
   - name: '{{ stack }} : Stack absent'
