@@ -14,7 +14,6 @@
   mount:
     src: "/dev/sdb1"
     path: "/mnt/distributed"
-    mode: 0750
     state: mounted
     fstype: ext4
     opts: defaults
@@ -28,11 +27,10 @@
   - "/var/lib/docker/volumes"
   - "/var/lib/docker/image"
 
-- name: Distributed directory '{{ item }}' bound
+- name: Distributed directory bound
   mount:
     path: "{{ item }}"
     src: "/mnt/distributed{{ item }}"
-    mode: 0750
     opts: bind
     state: mounted
     fstype: bind
