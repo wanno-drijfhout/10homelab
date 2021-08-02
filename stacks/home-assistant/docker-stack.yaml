@@ -1,0 +1,46 @@
+version: '3.6'
+services:
+  app:
+    image: homeassistant/home-assistant:stable
+    volumes:
+      # Manually configure: https://www.home-assistant.io/integrations/http#reverse-proxies
+      # Manually add:
+      #  - Printers (e.g., Brother)
+      #  - DMSR Slimme meter
+      #  - Forecast.Solar
+      #  - IKEA TRAD!FRI
+      #  - Fritz!Box stuff
+      #  - Kodi
+      #  - OpenTherm gateway
+      #  - Pi-hole
+      #  - Shoppinglist
+      #  - Sonarr
+      #  - Speedtest.net
+      #  - Spotify
+      #  - 
+      - default:/config
+      - /etc/localtime:/etc/localtime:ro
+    #network_mode: host
+    networks:
+      - proxy
+    # dns:  ## FIX  reply from unexpected source: 172.18.0.1#53, expected 10.69.10.255#53
+    #  - "${SWARM_SHARED_IP}"
+    privileged: true
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+      labels:
+        - "traefik.http.routers.home-assistant-app.entrypoints=https,https-ext"
+        - "traefik.http.services.home-assistant-app.loadbalancer.server.port=8123"
+
+  #TODO: add mqtt server & connect Wallpanel
+
+networks:
+  proxy:
+    name: proxy
+    external: true
+    
+volumes:
+  default:
