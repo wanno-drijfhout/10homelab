@@ -26,13 +26,13 @@
   set_fact:
     secret_names: >
       {{ secret_files.files | map(attribute='path') | map('basename')
-       | map('regex_replace', '^(.*)\\.secret(\\.generate)?$', stack + '_\\1')
+       | map('regex_replace', '^(.*)\.secret(\.generate)?$', stack + '_\1')
        | unique | list
       }}
 
 - name: '{{ stack }} : Stack secrets (facts)'
   set_fact:
-      "{{ item }}": "{{ lookup('password', (item | regex_replace('^' + stack + '_(.*)$', 'Stacks/' + stack + '/\\1.secret') ) ) }}"
+    "{{ item }}": "{{ lookup('password', (item | regex_replace('^' + stack + '_(.*)$', 'Stacks/' + stack + '/\\1.secret') ) ) }}"
   with_items: "{{ secret_names }}"
 
 - name: '{{ stack }} : Stack template files found'
