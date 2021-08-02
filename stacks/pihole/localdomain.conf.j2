@@ -1,0 +1,19 @@
+# dnsmasq configuration
+
+# Add local-only domains here, queries in these domains are answered
+# from /etc/hosts or DHCP only.
+local=/{{ DOMAIN }}/
+
+# Add domains which you want to force to an IP address here.
+# The example below send any host in keizerlijk.eu to a local
+# web-server.
+address=/{{ DOMAIN }}/{{ SWARM_SHARED_IP }}
+
+# Set the domain for dnsmasq. this is optional, but if it is set, it
+# does the following things.
+# 1) Allows DHCP hosts to have fully qualified domain names, as long
+#     as the domain part matches this setting.
+# 2) Sets the "domain" DHCP option thereby potentially setting the
+#    domain of all systems configured by DHCP
+# 3) Provides the domain part for "expand-hosts"
+domain={{ DOMAIN }}

@@ -1,0 +1,121 @@
+version: '3.6'
+
+# https://github.com/lndj/traefik-with-swarm/blob/master/traefik-proxy-compose.yaml
+
+services:
+  app:
+    image: traefik:2.4
+    command:
+      - --ping
+      - --accesslog=true
+      - --accesslog.filters.statuscodes=400-599
+      - --api=true
+      - --api.dashboard=true
+      # For access to Traefik dashboard via implicit "--entryPoints.traefik.address=:8080", uncomment:
+      #- --api.insecure=true
+      # For debugging, uncomment:
+      #- --api.debug=true
+      #- --log.level=DEBUG
+
+      - --certificatesresolvers.letsencrypt.acme.email=${ADMIN_EMAIL}
+      #- --certificatesresolvers.letsencrypt.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory
+      #- --certificatesresolvers.letsencrypt.acme.storage=/letsencrypt/acme-staging.json
+      - --certificatesresolvers.letsencrypt.acme.storage=/letsencrypt/acme.json
+      # See https://letsencrypt.org/2019/10/09/onboarding-your-customers-with-lets-encrypt-and-acme.html
+      - --certificatesresolvers.letsencrypt.acme.httpChallenge=true
+      - --certificatesresolvers.letsencrypt.acme.httpChallenge.entryPoint=http-ext
+      # - --certificatesresolvers.letsencrypt.acme.dnsChallenge=true
+      # - --certificatesresolvers.letsencrypt.acme.dnsChallenge.provider="transip"
+
+      - --providers.docker.endpoint=unix:///var/run/docker.sock
+      - --providers.docker.swarmMode=true
+      - --providers.docker.network=proxy
+      - --providers.docker.defaultRule=Host(`{{ normalize (index .Labels "com.docker.stack.namespace") }}.${DOMAIN}`)
+
+      - --entryPoints.http.address=:80
+      - --entryPoints.http.http.redirections.entryPoint.to=https
+      - --entryPoints.http.http.redirections.entryPoint.permanent=true
+      - --entryPoints.http.http.middlewares=static-app-errorpages@docker
+      
+      - --entryPoints.http-ext.address=:44080
+      - --entryPoints.http-ext.http.redirections.entryPoint.to=https # Must redirect to :443 port
+      - --entryPoints.http-ext.http.redirections.entryPoint.permanent=true
+      - --entryPoints.http-ext.http.middlewares=static-app-errorpages@docker
+
+      - --entryPoints.https.address=:443
+      - --entryPoints.https.http.tls.certresolver=letsencrypt
+      - --entryPoints.https.http.middlewares=static-app-errorpages@docker
+
+      - --entryPoints.https-ext.address=:44443
+      - --entryPoints.https-ext.http.tls.certresolver=letsencrypt
+      - --entryPoints.https-ext.http.middlewares=static-app-errorpages@docker
+
+      # Necessary for routing to back-ends with self-signed SSL certificates
+      #- --serversTransport.insecureSkipVerify=true
+
+      # Routers will accept requests from all defined entry points by default; add labels like:
+      # "traefik.http.routers.$STACK-$SERVICE.entryPoints=web,websecure"
+    ports:
+      - target: 8080
+        published: 8080   # traefik
+        protocol: tcp
+        mode: host
+      - target: 80
+        published: 80     # http
+        protocol: tcp
+        mode: host
+      - target: 443
+        published: 443    # https
+        protocol: tcp
+        mode: host
+      - target: 44080
+        published: 44080  # http-ext
+        protocol: tcp
+        mode: host
+      - target: 44443
+        published: 44443  # https-ext
+        protocol: tcp
+        mode: host
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - letsencrypt:/letsencrypt
+    networks:
+      - proxy
+    deploy:
+      mode: global
+      placement:
+        constraints:
+          - node.role == manager
+        preferences:
+          - spread: node.id
+      labels:
+        # Dummy service for Swarm port detection. The port can be any valid integer value.
+        #- "traefik.http.services.dummy.loadbalancer.server.port=9999"
+        - "traefik.http.services.traefik-app.loadbalancer.server.port=8080"
+        - "traefik.http.routers.traefik-app.entrypoints=https"
+        - "traefik.http.routers.traefik-app.service=api@internal"
+        - "traefik.http.routers.traefik-app.middlewares=static-app-errorpages"
+
+        # Reusable middlewares
+
+        - "traefik.http.middlewares.static-app-errorpages.errors.status=400,401,403,404,409,500"
+        - "traefik.http.middlewares.static-app-errorpages.errors.service=static-app"
+        - "traefik.http.middlewares.static-app-errorpages.errors.query=/{status}.html"
+        
+        #- "traefik.http.middlewares.internal-only.ipwhitelist.sourcerange=127.0.0.1/32, ${DOMAIN_CIDR}"
+
+        #- "traefik.http.middlewares.reqAuth.forwardauth.address=https://auth.${DOMAIN}"
+        #- "traefik.http.middlewares.reqAuth.forwardauth.authResponseHeaders=X-Forwarded-User"
+        #- "traefik.http.middlewares.reqAuth.forwardauth.trustForwardHeader=true"
+
+    healthcheck:
+      test: traefik healthcheck --ping
+
+volumes:
+  letsencrypt:
+
+networks:
+  proxy:
+    name: proxy
+    external: true
+

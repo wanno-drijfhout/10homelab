@@ -1,0 +1,17 @@
+version: '3.6'
+
+services:
+  app:
+    image: containous/whoami
+    networks:
+     - proxy
+    deploy:
+      mode: global
+      labels:
+        - "traefik.http.services.whoami-app.loadbalancer.server.port=80"
+        - "traefik.http.routers.whoami-app.entrypoints=https,http,https-ext,http-ext"
+
+networks:
+  proxy:
+    name: proxy
+    external: true

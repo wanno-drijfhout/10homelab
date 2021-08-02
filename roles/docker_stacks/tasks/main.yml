@@ -5,8 +5,8 @@
 
 - name: '{{ stack }} : Stack files copied'
   copy:
-    src: "Stacks/{{ stack }}/"
-    dest: "Stacks/{{ stack }}"
+    src: "stacks/{{ stack }}/"
+    dest: "stacks/{{ stack }}"
     mode: 0755
   register: copied
 
@@ -28,7 +28,7 @@
 
   - name: '{{ stack }} : Stack secret files found'
     find:
-      paths: "Stacks/{{ stack }}/"
+      paths: "stacks/{{ stack }}/"
       recurse: yes
       patterns:
       - "*.secret.generate"
@@ -46,12 +46,12 @@
 
   - name: '{{ stack }} : Stack secrets (facts)'
     set_fact:
-      "{{ item }}": "{{ lookup('password', (item | regex_replace('^' + stack + '_(.*)$', 'Stacks/' + stack + '/\\1.secret') ) ) }}"
+      "{{ item }}": "{{ lookup('password', (item | regex_replace('^' + stack + '_(.*)$', 'stacks/' + stack + '/\\1.secret') ) ) }}"
     with_items: "{{ secret_names }}"
 
   - name: '{{ stack }} : Stack template files found'
     find:
-      paths: "Stacks/{{ stack }}/"
+      paths: "stacks/{{ stack }}/"
       recurse: yes
       patterns: "*.j2"
     register: template_files
@@ -80,7 +80,7 @@
   - name: '{{ stack }} : Stack present'
     docker_stack:
       name: "{{ stack }}"
-      compose: ["Stacks/{{ stack }}/docker-stack.yaml"]
+      compose: ["stacks/{{ stack }}/docker-stack.yaml"]
       prune: true
     retries: 2
     delay: 5
@@ -94,7 +94,7 @@
 
   - name: '{{ stack }} : Stack has ansible file?'
     stat:
-      path: "Stacks/{{ stack }}/main.ansible.yaml"
+      path: "stacks/{{ stack }}/main.ansible.yaml"
     register: stack_ansible_file
 
   - name: '{{ stack }} : Stack await online'
@@ -107,5 +107,5 @@
     when: stack_ansible_file.stat.exists
 
   - name: '{{ stack }} : Stack tasks included'
-    include_tasks: "Stacks/{{ stack }}/main.ansible.yaml"
+    include_tasks: "stacks/{{ stack }}/main.ansible.yaml"
     when: stack_ansible_file.stat.exists
