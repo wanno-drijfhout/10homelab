@@ -1,11 +1,10 @@
- __          .__                    .__  .__     __ __                     
-|  | __ ____ |__|_______ ___________|  | |__|   |__|  | __     ____  __ __ 
-|  |/ // __ \|  \___   // __ \_  __ \  | |  |   |  |  |/ /   _/ __ \|  |  \
-|    <\  ___/|  |/    /\  ___/|  | \/  |_|  |   |  |    <    \  ___/|  |  /
-|__|_ \\___  >__/_____ \\___  >__|  |____/__/\__|  |__|_ \ /\ \___  >____/ 
-     \/    \/         \/    \/              \______|    \/ \/     \/       
+---
+Powered by [10homelab](https://github.com/wanno-drijfhout/10homelab)
 
----
-Node: {{ ansible_nodename }}
-Host: {{ ansible_host }}
----
+Domain    : {{ DOMAIN }}
+CIDR      : {{ DOMAIN_CIDR }}
+IP        : {{ ansible_host }}
+
+Location  : {{ LOCATION }}
+Inventory : {{ inventory_dir | basename }}
+Node      : {{ ansible_nodename }}
