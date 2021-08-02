@@ -16,7 +16,7 @@
     url: "{{ stack_url }}"
   ignore_errors: yes
   register: online
-  
+
 - when: copied.changed or online.failed
   block:
   # Pruning stacks is necessary to update config files and secrets
