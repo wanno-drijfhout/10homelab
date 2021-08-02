@@ -1,101 +1,111 @@
 ---
-  # Pruning stacks is necessary to update config files and secrets
-- name: '{{ stack }} : Stack absent'
-  docker_stack:
-    name: "{{ stack }}"
-    state: absent
-    absent_retries: 10
+- name: '{{ stack }} : Stack URL'
+  set_fact:
+    stack_url: "https://{{ stack }}.{{ DOMAIN }}"
 
 - name: '{{ stack }} : Stack files copied'
   copy:
     src: "Stacks/{{ stack }}/"
     dest: "Stacks/{{ stack }}"
-    mode: 0640
+    mode: 0755
+  register: copied
 
-- name: '{{ stack }} : Stack secret files found'
-  find:
-    paths: "Stacks/{{ stack }}/"
-    recurse: yes
-    patterns:
-    - "*.secret.generate"
-    - "*.secret"
-    #size: "0"
-  register: secret_files
-
-- name: '{{ stack }} : Stack secret names (fact)'
-  set_fact:
-    secret_names: >
-      {{ secret_files.files | map(attribute='path') | map('basename')
-       | map('regex_replace', '^(.*)\.secret(\.generate)?$', stack + '_\1')
-       | unique | list
-      }}
-
-- name: '{{ stack }} : Stack secrets (facts)'
-  set_fact:
-    "{{ item }}": "{{ lookup('password', (item | regex_replace('^' + stack + '_(.*)$', 'Stacks/' + stack + '/\\1.secret') ) ) }}"
-  with_items: "{{ secret_names }}"
-
-- name: '{{ stack }} : Stack template files found'
-  find:
-    paths: "Stacks/{{ stack }}/"
-    recurse: yes
-    patterns: "*.j2"
-  register: template_files
-
-- name: '{{ stack }} : Stack template substituted'
-  template:
-    src: "{{ item }}"
-    dest: "{{ item | splitext | first }}" # Remove the .j2 extension
-    mode: 0640
-    force: yes
-    # Also, you can override jinja2 settings by adding a special header to template file. i.e.
-    #
-    #   #jinja2:variable_start_string:'[%', variable_end_string:'%]', trim_blocks: False
-    #
-    # which changes the variable interpolation markers to [% var %] instead of {{ var }}.
-    # This is the best way to prevent evaluation of things that look like, but should not be Jinja2.
-  with_items: "{{ template_files.files | map(attribute='path') | list }}"
-
-- name: '{{ stack }} : Stack secret absent'
-  docker_secret:
-    name: "{{ item }}"
-    state: absent
-    force: yes
-  with_items: "{{ secret_names }}"
-
-- name: '{{ stack }} : Stack present'
-  docker_stack:
-    name: "{{ stack }}"
-    compose: ["Stacks/{{ stack }}/docker-stack.yaml"]
-    prune: true
-  retries: 2
-  delay: 5
-  environment:
-    ADMIN_EMAIL: "{{ ADMIN_EMAIL }}"
-    DOMAIN: "{{ DOMAIN }}"
-    DOMAIN_CIDR: "{{ DOMAIN_CIDR }}"
-    GATEWAY_IP: "{{ GATEWAY_IP }}"
-    SWARM_SHARED_IP: "{{ SWARM_SHARED_IP }}"
-    LOCATION: "{{ LOCATION }}"
-
-- name: '{{ stack }} : Stack has ansible file?'
-  stat:
-    path: "Stacks/{{ stack }}/main.ansible.yaml"
-  register: stack_ansible_file
-
-- name: '{{ stack }} : Stack URL'
-  set_fact:
-    stack_url: "https://{{ stack }}.{{ DOMAIN }}"
-
-- name: '{{ stack }} : Stack await online'
+- when: not copied.changed                                            # noqa 503
+  name: '{{ stack }} : Stack await online'
   uri:
     url: "{{ stack_url }}"
-  register: result
-  until: result.status >= 200 and result.status <= 399
-  retries: 30
-  delay: 1
-  when: stack_ansible_file.stat.exists
+  ignore_errors: yes
+  register: online
 
-- name: '{{ stack }} : Stack tasks included'
-  include_tasks: "Stacks/{{ stack }}/main.ansible.yaml"
-  when: stack_ansible_file.stat.exists
+- when: copied.changed or online.failed                               # noqa 503
+  block:
+  # Pruning stacks is necessary to update config files and secrets
+  - name: '{{ stack }} : Stack absent'
+    docker_stack:
+      name: "{{ stack }}"
+      state: absent
+      absent_retries: 10
+
+  - name: '{{ stack }} : Stack secret files found'
+    find:
+      paths: "Stacks/{{ stack }}/"
+      recurse: yes
+      patterns:
+      - "*.secret.generate"
+      - "*.secret"
+      #size: "0"
+    register: secret_files
+
+  - name: '{{ stack }} : Stack secret names (fact)'
+    set_fact:
+      secret_names: >
+        {{ secret_files.files | map(attribute='path') | map('basename')
+        | map('regex_replace', '^(.*)\.secret(\.generate)?$', stack + '_\1')
+        | unique | list
+        }}
+
+  - name: '{{ stack }} : Stack secrets (facts)'
+    set_fact:
+      "{{ item }}": "{{ lookup('password', (item | regex_replace('^' + stack + '_(.*)$', 'Stacks/' + stack + '/\\1.secret') ) ) }}"
+    with_items: "{{ secret_names }}"
+
+  - name: '{{ stack }} : Stack template files found'
+    find:
+      paths: "Stacks/{{ stack }}/"
+      recurse: yes
+      patterns: "*.j2"
+    register: template_files
+
+  - name: '{{ stack }} : Stack template substituted'
+    template:
+      src: "{{ item }}"
+      dest: "{{ item | splitext | first }}" # Remove the .j2 extension
+      mode: 0640
+      force: yes
+      # Also, you can override jinja2 settings by adding a special header to template file. i.e.
+      #
+      #   #jinja2:variable_start_string:'[%', variable_end_string:'%]', trim_blocks: False
+      #
+      # which changes the variable interpolation markers to [% var %] instead of {{ var }}.
+      # This is the best way to prevent evaluation of things that look like, but should not be Jinja2.
+    with_items: "{{ template_files.files | map(attribute='path') | list }}"
+
+  - name: '{{ stack }} : Stack secret absent'
+    docker_secret:
+      name: "{{ item }}"
+      state: absent
+      force: yes
+    with_items: "{{ secret_names }}"
+
+  - name: '{{ stack }} : Stack present'
+    docker_stack:
+      name: "{{ stack }}"
+      compose: ["Stacks/{{ stack }}/docker-stack.yaml"]
+      prune: true
+    retries: 2
+    delay: 5
+    environment:
+      ADMIN_EMAIL: "{{ ADMIN_EMAIL }}"
+      DOMAIN: "{{ DOMAIN }}"
+      DOMAIN_CIDR: "{{ DOMAIN_CIDR }}"
+      GATEWAY_IP: "{{ GATEWAY_IP }}"
+      SWARM_SHARED_IP: "{{ SWARM_SHARED_IP }}"
+      LOCATION: "{{ LOCATION }}"
+
+  - name: '{{ stack }} : Stack has ansible file?'
+    stat:
+      path: "Stacks/{{ stack }}/main.ansible.yaml"
+    register: stack_ansible_file
+
+  - name: '{{ stack }} : Stack await online'
+    uri:
+      url: "{{ stack_url }}"
+    register: result
+    until: result.status >= 200 and result.status <= 399
+    retries: 30
+    delay: 1
+    when: stack_ansible_file.stat.exists
+
+  - name: '{{ stack }} : Stack tasks included'
+    include_tasks: "Stacks/{{ stack }}/main.ansible.yaml"
+    when: stack_ansible_file.stat.exists

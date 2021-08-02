@@ -17,9 +17,9 @@ all:
         SWARM_SHARED_IP: 10.<<XX>>.<<YY>>.255
         STACKS:
         - traefik
+        - pihole
         - static
         - whoami
-        - pihole
         - portainer
         - organizr
         - nextcloud
