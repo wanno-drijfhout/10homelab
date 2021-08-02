@@ -56,6 +56,33 @@ services:
       - db
       - redis
 
+  cron:
+    image: nextcloud
+    volumes:
+      - default:/var/www/html
+      - data:/var/www/html/data
+    user: www-data
+    depends_on:
+      - app
+    networks:
+      - default
+    entrypoint: |
+      bash -c 'bash -s <<EOF
+        trap "break;exit" SIGHUP SIGINT SIGTERM
+        while [ ! -f /var/www/html/config/config.php ]; do
+          sleep 1
+        done
+        echo Config detected
+        while true; do
+          echo ---
+          time php /var/www/html/cron.php
+          sleep 5m
+        done
+      EOF'
+    deploy:
+      labels:
+        - "traefik.enable=false"
+
   db:
     image: postgres
     networks:
