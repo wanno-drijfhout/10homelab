@@ -1,5 +1,0 @@
----
-- hosts: hardware
-  roles:
-    - common
-    #- hardware-monitoring
