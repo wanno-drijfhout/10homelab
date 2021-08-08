@@ -1,0 +1,13 @@
+---
+- hosts: hardware
+  roles:
+    - common
+    #- hardware-monitoring
+- hosts: appservers
+  roles:
+    - common
+    - docker_storage
+    - docker_engine
+    - keepalived
+    - dns
+    - docker_swarm
