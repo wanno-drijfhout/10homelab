@@ -29,11 +29,10 @@ services:
     secrets:
       - webpassword
     environment:
+      #QUERY_LOGGING: "true"  # Set to false for improved privacy
       TZ: 'Europe/Amsterdam'
       PROXY_LOCATION: "pihole.${DOMAIN}"
       ADMIN_EMAIL: "${ADMIN_EMAIL}"
-      # The WEBPASSWORD will be generated and visible in the container logs! Run `docker logs pihole | grep random` to find your random pass.
-      #WEBPASSWORD: 'Some random password'  # https://github.com/pi-hole/docker-pi-hole/issues/556
       WEBPASSWORD_FILE: /run/secrets/webpassword
       PIHOLE_DNS_: "127.0.0.1;10.0.0.2;${GATEWAY_IP}"
 
