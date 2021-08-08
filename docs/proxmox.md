@@ -13,10 +13,10 @@ Install on the SSD.
 Use network settings:
 
 - FQDN: `<host>.<domain>`
-- IP address: `10.69.1.20`
+- IP address: `10.<<XX>>.1.20`
 - Netmask: `255.255.0.0`
-- Gateway: `10.69.1.1`
-- DNS Server: `10.69.1.1`
+- Gateway: `10.<<XX>>.1.1`
+- DNS Server: `10.<<XX>>.1.1` (*Note: this is not the Pi-hole DNS we may run later*)
 
 Maximize the local SSD storage:
 

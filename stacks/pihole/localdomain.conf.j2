@@ -7,7 +7,10 @@ local=/{{ DOMAIN }}/
 # Add domains which you want to force to an IP address here.
 # The example below send any host in {{ DOMAIN }} to a local
 # web-server.
+# -- IPv4
 address=/{{ DOMAIN }}/{{ SWARM_SHARED_IP }}
+# -- IPv6 (currently disabled)
+address=/{{ DOMAIN }}/
 
 # Set the domain for dnsmasq. this is optional, but if it is set, it
 # does the following things.
