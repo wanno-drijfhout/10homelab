@@ -36,8 +36,8 @@ Open the noVNC terminal and install Ubuntu server.
   - Subnet: `10.<<XX>>.0.0/16`
   - Address: `10.<<XX>>.10.0`
   - Gateway: `10.<<XX>>.1.1`
-  - Name servers: `10.<<XX>>.1.1` (the native DNS in your network, like the Fritz!Box)
-  - Search domains: `fritz.box`
+  - Name servers: (swarm Pi-hole) `10.<<XX>>.10.255` and (Fritz!Box) `10.<<XX>>.1.1`
+  - Search domains: (swarm domain) `<<example.org>>` and `fritz.box`
 - Profile setup
   - Your name: `New user`
   - Your server's name: `app-stable-1`
@@ -61,7 +61,7 @@ Disconnect
 
 ## Configure Docker engine
 
-We'll need to configure the Docker explicitly in `/etc/docker/daemon.json` to use its internal `docker_gwbridge` network to connect to the pihole we'll deploy later. This overrides whatever the hosts `/etc/resolve.conf` might have set, which is desirable to keep the host independent of one of its children.
+We'll need to configure the Docker explicitly in `/etc/docker/daemon.json` to use its internal `docker_gwbridge` network to connect to the pihole we'll deploy later. Docker usually extracts this information from the host's `/etc/resolve.conf`, but this breaks isolation and doesn't always work properly.
 
 ```json
 {

@@ -12,11 +12,11 @@ Install on the SSD.
 
 Use network settings:
 
-- FQDN: `<host>.<domain>`
+- FQDN: `<host>.<domain>` (*Note: this is the DHCP domain; e.g., `fritz.box`)
 - IP address: `10.<<XX>>.1.20`
 - Netmask: `255.255.0.0`
 - Gateway: `10.<<XX>>.1.1`
-- DNS Server: `10.<<XX>>.1.1` (*Note: this is not the Pi-hole DNS we may run later*)
+- DNS Server: `10.<<XX>>.1.1` (*Note: this is the DHCP server IP; e.g., the Fritz!Box)
 
 Maximize the local SSD storage:
 
