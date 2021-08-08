@@ -70,9 +70,7 @@ services:
       #    - node.role == manager
       labels:
         - "traefik.http.routers.pihole-app.rule=Host(`pihole.${DOMAIN}`) || Host(`pi.hole`)"
-        - "traefik.http.routers.pihole-app.middlewares=pihole-addprefix"
         - "traefik.http.routers.pihole-app.entrypoints=https,http"
-        - "traefik.http.middlewares.pihole-addprefix.addprefix.prefix=/admin"
         - "traefik.http.services.pihole-app.loadbalancer.server.port=80"
         
 
