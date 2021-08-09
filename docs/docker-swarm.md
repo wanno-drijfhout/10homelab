@@ -28,6 +28,10 @@ Ensure the values correspond to the inventory file!
   - Memory (MiB): `16384` (= 16 GiB)
   - Minimum memory (MiB): `1024`
 
+Afterwards:
+
+- Add a USB device (host=1-3,usb3=1) so that `/dev/ttyUSB0` is accessible to the VM (useful for ESPHome)
+
 ## Configure Ubuntu
 
 Open the noVNC terminal and install Ubuntu server.

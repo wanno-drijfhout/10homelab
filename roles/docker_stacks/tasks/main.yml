@@ -24,7 +24,7 @@
     docker_stack:
       name: "{{ stack }}"
       state: absent
-      absent_retries: 10
+      absent_retries: 15
 
   - name: '{{ stack }} : Stack secret files found'
     find:
