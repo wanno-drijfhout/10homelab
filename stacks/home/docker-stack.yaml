@@ -47,13 +47,12 @@ services:
       - source: mosquitto.conf
         target: /mosquitto/config/mosquitto.conf
     volumes:
+      - mosquitto_users:/mosquitto/config/users
       - mosquitto_data:/mosquitto/data
-      - mosquitto_log:/mosquitto/log
-      - /etc/localtime:/etc/localtime:ro
-    #environment:
-    #  - TZ=Europe/Madrid
+    environment:
+      - TZ=Europe/Amsterdam
     networks:
-      - proxy
+      #- proxy
       - default
     deploy:
       replicas: 1
@@ -83,5 +82,5 @@ configs:
 
 volumes:
   assistant:
+  mosquitto_users:
   mosquitto_data:
-  mosquitto_log:
