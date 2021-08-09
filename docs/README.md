@@ -20,7 +20,7 @@ See our documentation on:
   - Reverse proxy **Traefik** (includes **Let's Encrypt** SSL certificates)
   - DNS and adblocker **Pi-hole** (includes local IP reroute for public domain)
   - Docker management tool **Portainer**
-  - Stack dashboard **Organizr**
+  - Domotica stack **Home Assistant** (includes **MQTT** and **ESPHome**)
   - Groupware **Nextcloud**
 
 ## Principles
