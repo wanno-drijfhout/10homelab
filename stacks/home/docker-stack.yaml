@@ -1,0 +1,87 @@
+version: '3.6'
+services:
+  assistant:
+    image: homeassistant/home-assistant:stable
+    volumes:
+      # Manually configure: https://www.home-assistant.io/integrations/http#reverse-proxies
+      # Manually add:
+      #  - Printers (e.g., Brother)
+      #  - DMSR Slimme meter
+      #  - Forecast.Solar
+      #  - IKEA TRAD!FRI
+      #  - Fritz!Box stuff
+      #  - Kodi
+      #  - OpenTherm gateway
+      #  - Pi-hole
+      #  - Shoppinglist
+      #  - Speedtest.net
+      #  - Spotify
+      #  - ...
+      - assistant:/config
+      - /etc/localtime:/etc/localtime:ro
+    networks:
+      - proxy
+      - default
+    privileged: true
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+      labels:
+        - "traefik.http.routers.home-assistant.entrypoints=https,https-ext"
+        - "traefik.http.services.home-assistant.loadbalancer.server.port=8123"
+
+  mosquitto:
+    image: eclipse-mosquitto
+    ports:
+      - target: 1883
+        published: 1883
+        protocol: tcp
+        mode: host
+      # - target: 9001
+      #   published: 9001
+      #   protocol: tcp
+      #   mode: host
+    configs:
+      - source: mosquitto.conf
+        target: /mosquitto/config/mosquitto.conf
+    volumes:
+      - mosquitto_data:/mosquitto/data
+      - mosquitto_log:/mosquitto/log
+      - /etc/localtime:/etc/localtime:ro
+    #environment:
+    #  - TZ=Europe/Madrid
+    networks:
+      - proxy
+      - default
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+      labels:
+        - "traefik.enabled=false"
+        # - "traefik.http.routers.home-mosquitto.entrypoints=https,https-ext"
+        # - "traefik.http.services.home-mosquitto.loadbalancer.server.port=1883"
+        # - "traefik.http.routers.home-mosquitto.rule=Host(`mqtt.${DOMAIN}`) || Host(`mosquitto.${DOMAIN}`)"
+
+  # TODO: add ESPHome
+
+  # https://webworxshop.com/my-road-to-docker-part-2-my-home-automation-stack/
+  # https://www.room-assistant.io/guide/#monitor
+
+networks:
+  proxy:
+    name: proxy
+    external: true
+  default:
+    
+configs:
+  mosquitto.conf:
+    file: ./mosquitto.conf
+
+volumes:
+  assistant:
+  mosquitto_data:
+  mosquitto_log:
