@@ -21,7 +21,6 @@ all:
         - static
         - whoami
         - portainer
-        - organizr
         - nextcloud
         - home
       hosts:
