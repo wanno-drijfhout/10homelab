@@ -23,6 +23,7 @@ all:
         - portainer
         - organizr
         - nextcloud
+        - home
       hosts:
         <<app-server-hostname>>:
           ansible_host: 10.<<XX>>.<<YY>>.1
