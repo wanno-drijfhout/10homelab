@@ -17,6 +17,7 @@ services:
       #  - Speedtest.net
       #  - Spotify
       #  - ...
+      #  - ESPHome ## Doesn't seem to work yet
       - assistant:/config
       - /etc/localtime:/etc/localtime:ro
     networks:
@@ -65,10 +66,24 @@ services:
         # - "traefik.http.services.home-mosquitto.loadbalancer.server.port=1883"
         # - "traefik.http.routers.home-mosquitto.rule=Host(`mqtt.${DOMAIN}`) || Host(`mosquitto.${DOMAIN}`)"
 
-  # TODO: add ESPHome
-
-  # https://webworxshop.com/my-road-to-docker-part-2-my-home-automation-stack/
-  # https://www.room-assistant.io/guide/#monitor
+  esphome:
+    image: esphome/esphome
+    volumes:
+      - esphome:/config
+    devices:
+      - /dev/ttyUSB0    # For flashing
+    networks:
+      - proxy
+      - default
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+      labels:
+        - "traefik.http.services.home-esphome.loadbalancer.server.port=6052"
+        - "traefik.http.routers.home-esphome.entrypoints=https"
+        - "traefik.http.routers.home-esphome.rule=Host(`esphome.${DOMAIN}`)"
 
 networks:
   proxy:
@@ -82,5 +97,6 @@ configs:
 
 volumes:
   assistant:
+  esphome:
   mosquitto_users:
   mosquitto_data:
