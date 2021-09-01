@@ -28,3 +28,5 @@ You can use the Raspberry as audio output device from a mobile phone (by connect
 6. Reboot
 
 Sources: [1](https://forum.kodi.tv/showthread.php?tid=154537&pid=1321799#pid1321799), [2](https://forum.libreelec.tv/thread/21318-libreelec-kodi-as-a-bluetooth-audio-receiver/?postID=144349#post144349)
+
+See also: [3](https://wiki.libreelec.tv/configuration/pulseaudio#bluetooth-receiving)
