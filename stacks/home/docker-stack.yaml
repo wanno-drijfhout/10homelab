@@ -18,6 +18,7 @@ services:
       #  - Spotify
       #  - ...
       #  - ESPHome ## Doesn't seem to work yet
+      #  - https://github.com/bramstroker/homeassistant-powercalc : put "custom_components/powercalc" in "config/custom_components/powercalc"
       - assistant:/config
       - /etc/localtime:/etc/localtime:ro
     networks:
