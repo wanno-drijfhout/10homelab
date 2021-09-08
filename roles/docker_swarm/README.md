@@ -1,6 +1,6 @@
-# Create cluster
+# Docker Swarm
 
-Setting up a Docker (Linux) Swarm node ("drone") requires a number of steps.
+Setting up a Docker (Linux) Swarm node cluster requires a number of steps.
 
 ## Create Virtual Machine
 
@@ -8,7 +8,7 @@ Ensure the values correspond to the inventory file!
 
 - General:
   - VM ID: `69010123` (10.**69.010.123**; substitute as relevant)
-  - Name: e.g., `drone-0`
+  - Name: e.g., `app-node-0`
   - Start at boot: *checked*
 - OS:
   - Use [Ubuntu Server 20.04](https://ubuntu.com/download/server)
@@ -40,7 +40,7 @@ Open the noVNC terminal and install Ubuntu server.
   - Subnet: `10.<<XX>>.0.0/16`
   - Address: `10.<<XX>>.10.0`
   - Gateway: `10.<<XX>>.1.1`
-  - Name servers: (swarm Pi-hole) `10.<<XX>>.10.255` and (Fritz!Box) `10.<<XX>>.1.1`
+  - Name servers: (swarm Pi-hole) `10.<<XX>>.10.255` and (FRITZ!Box) `10.<<XX>>.1.1`
   - Search domains: (swarm domain) `<<example.org>>` and `fritz.box`
 - Profile setup
   - Your name: `New user`
