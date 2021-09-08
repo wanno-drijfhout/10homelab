@@ -1,0 +1,2 @@
+- Deployment automation **Ansible**
+- Home network configuration for local **CIDR** (10.x.y.z/16) and **domain**

@@ -1,0 +1,3 @@
+- Hypervisor **Proxmox**
+- Distributed storage platform **Ceph** (built in Promox)
+- Distributed computing platform **Docker Swarm**

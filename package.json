@@ -1,0 +1,28 @@
+{
+    "name": "10homelab",
+    "version": "0.0.0",
+    "description": "The \"10homelab\" project configures a home server, sufficiently secure and maintainable for personal use by fake nerds.",
+    "directories": {
+        "doc": "docs"
+    },
+    "dependencies": {
+        "docsify": "^4.12.1"
+    },
+    "devDependencies": {
+        "docsify-cli": "^4.4.3"
+    },
+    "scripts": {
+        "serve": "start http://localhost:3000 && docsify serve",
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/wanno-drijfhout/10homelab.git"
+    },
+    "author": "",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/wanno-drijfhout/10homelab/issues"
+    },
+    "homepage": "https://github.com/wanno-drijfhout/10homelab#readme"
+}

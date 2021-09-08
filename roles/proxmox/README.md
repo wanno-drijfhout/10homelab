@@ -1,4 +1,4 @@
-# Install Proxmox
+# Proxmox
 
 ## Prepare USB-stick with PVE
 
