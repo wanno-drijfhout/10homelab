@@ -1,4 +1,4 @@
-# Home Theater PC (Raspberry Pi)
+# Home Theater PC
 
 We use a Raspberry Pi 4 as HTPC.
 
