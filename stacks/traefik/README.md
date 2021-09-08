@@ -1,6 +1,6 @@
 # Traefik
 
-![Traefik](https://doc.traefik.io/traefik/assets/images/logo-traefik-proxy-logo.svg ':size=96px') *Simplify networking complexity while designing, deploying, and operating applications.*
+![Traefik](https://doc.traefik.io/traefik/assets/images/logo-traefik-proxy-logo.svg ':size=96px') *[Traefik proxy] is simplify networking complexity while designing, deploying, and operating applications.*
 
 ## Features
 
@@ -12,10 +12,15 @@
 
 ## Resources
 
-- [Traefik proxy](https://traefik.io/traefik/)
-- [Traefik proxy documentation](https://doc.traefik.io/traefik/)
-- [Let's Encrypt](https://letsencrypt.org/)
-- [Onboarding Your Customers with Let's Encrypt and ACME](https://letsencrypt.org/2019/10/09/onboarding-your-customers-with-lets-encrypt-and-acme.html)
+- [Traefik proxy]
+- [Traefik proxy documentation]
+- [Let's Encrypt]
+- [Onboarding Your Customers with Let's Encrypt and ACME]
+
+[Traefik proxy]: https://traefik.io/traefik/
+[Traefik proxy documentation]: https://doc.traefik.io/traefik/
+[Let's Encrypt]: https://letsencrypt.org/
+[Onboarding Your Customers with Let's Encrypt and ACME]: https://letsencrypt.org/2019/10/09/onboarding-your-customers-with-lets-encrypt-and-acme.html
 
 ## docker-stack.yaml
 

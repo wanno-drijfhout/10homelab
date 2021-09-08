@@ -3,3 +3,4 @@
 - Docker management tool **Portainer**
 - Domotica stack **Home Assistant** (includes **MQTT** and **ESPHome**)
 - Groupware **Nextcloud**
+- Weblog **Grav**
