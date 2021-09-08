@@ -1,0 +1,17 @@
+- [📝 Inventories](/inventories/)
+  - [Becoming an administrator](/inventories/administration.md)
+  - [Hardware management](/inventories/hardware.md)
+  - [Network](/inventories/network.md)
+
+- [🎩 Roles](/roles/)
+  - [Proxmox](/roles/proxmox/)
+  - [Docker Swarm](/roles/docker_swarm/)
+
+- [🧱 Stacks](/stacks/)
+  - [traefik](/stacks/traefik/)
+  - [pihole](/stacks/pihole/)
+  - [whoami](/stacks/whoami/)
+  - [portainer](/stacks/portainer/)
+  - [home](/stacks/home/)
+  - [nextcloud](/stacks/nextcloud/)
+  - [grav](/stacks/grav/)

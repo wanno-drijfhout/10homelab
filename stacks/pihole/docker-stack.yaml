@@ -1,9 +1,5 @@
 version: "3.6"
 
-# More info at 
-# - https://docs.pi-hole.net/routers/fritzbox/
-# - https://github.com/pi-hole/docker-pi-hole/ 
-# - https://docs.pi-hole.net/
 services:
   app:
     image: pihole/pihole:v5.8.1
@@ -41,7 +37,7 @@ services:
       REV_SERVER_TARGET: "${GATEWAY_IP}"
       REV_SERVER_CIDR: "${DOMAIN_CIDR}"
 
-      # Configure your network router (e.g., Fritz!Box) to use this IP as the "Local DNS server"
+      # Configure your network router (e.g., FRITZ!Box) to use this IP as the "Local DNS server"
       # in Home Network > Network > IPv4 Addresses
       ServerIP: "${SWARM_SHARED_IP}"
       #ServerIPv6: ''
