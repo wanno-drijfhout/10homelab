@@ -2,6 +2,7 @@
   - [Becoming an administrator](/inventories/administration.md)
   - [Hardware management](/inventories/hardware.md)
   - [Network](/inventories/network.md)
+  - [Home Theater PC](/inventories/htpc.md)
 
 - [🎩 Roles](/roles/)
   - [Proxmox](/roles/proxmox/)
