@@ -2,13 +2,18 @@
 
 ![Pi-hole](https://wp-cdn.pi-hole.net/wp-content/uploads/2016/12/Vortex-R.png ':size=96px') *Network-wide ad blocking via your own Linux hardware*
 
-We use Pi-hole primarily for its DNS service.
+## Features
+
+- [x] Advertisement and tracking blocker
+- [x] Local DNS server
+- [x] Overridden local `DOMAIN` name resolution to `SWARM_SHARED_IP` for performance and [distinguishing internal and external traffic](/inventories/network)
+- [ ] IPv6 support
 
 ## Resources
 
 - [Pi-hole](https://pi-hole.net/)
 - [Pi-hole documentation](https://docs.pi-hole.net/)
-- [Fritz!Box (EN) - Pi-hole documentation](https://docs.pi-hole.net/routers/fritzbox/)
+- [FRITZ!Box (EN) - Pi-hole documentation](https://docs.pi-hole.net/routers/fritzbox/)
 - [Pi-hole in a docker container](https://github.com/pi-hole/docker-pi-hole/)
 
 ## localdomain.conf
@@ -17,7 +22,7 @@ We use Pi-hole primarily for its DNS service.
 
 ## webpassword.secret
 
-*Generated*
+*Generated.*
 
 ## docker-stack.yaml
 

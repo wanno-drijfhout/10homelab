@@ -16,7 +16,7 @@ Use network settings:
 - IP address: `10.<<XX>>.1.20`
 - Netmask: `255.255.0.0`
 - Gateway: `10.<<XX>>.1.1`
-- DNS Server: `10.<<XX>>.1.1` (*Note: this is the DHCP server IP; e.g., the Fritz!Box)
+- DNS Server: `10.<<XX>>.1.1` (*Note: this is the DHCP server IP; e.g., the FRITZ!Box)
 
 Maximize the local SSD storage:
 

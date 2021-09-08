@@ -9,7 +9,7 @@ services:
       #  - DMSR Slimme meter
       #  - Forecast.Solar
       #  - IKEA TRAD!FRI
-      #  - Fritz!Box stuff
+      #  - FRITZ!Box stuff
       #  - Kodi
       #  - OpenTherm gateway
       #  - Pi-hole

@@ -40,7 +40,7 @@ Open the noVNC terminal and install Ubuntu server.
   - Subnet: `10.<<XX>>.0.0/16`
   - Address: `10.<<XX>>.10.0`
   - Gateway: `10.<<XX>>.1.1`
-  - Name servers: (swarm Pi-hole) `10.<<XX>>.10.255` and (Fritz!Box) `10.<<XX>>.1.1`
+  - Name servers: (swarm Pi-hole) `10.<<XX>>.10.255` and (FRITZ!Box) `10.<<XX>>.1.1`
   - Search domains: (swarm domain) `<<example.org>>` and `fritz.box`
 - Profile setup
   - Your name: `New user`
