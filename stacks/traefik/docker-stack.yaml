@@ -31,20 +31,16 @@ services:
       - --entryPoints.http.address=:80
       - --entryPoints.http.http.redirections.entryPoint.to=https
       - --entryPoints.http.http.redirections.entryPoint.permanent=true
-      - --entryPoints.http.http.middlewares=static-app-errorpages@docker
       
       - --entryPoints.http-ext.address=:44080
       - --entryPoints.http-ext.http.redirections.entryPoint.to=https # Must redirect to :443 port
       - --entryPoints.http-ext.http.redirections.entryPoint.permanent=true
-      - --entryPoints.http-ext.http.middlewares=static-app-errorpages@docker
 
       - --entryPoints.https.address=:443
       - --entryPoints.https.http.tls.certresolver=letsencrypt
-      - --entryPoints.https.http.middlewares=static-app-errorpages@docker
 
       - --entryPoints.https-ext.address=:44443
       - --entryPoints.https-ext.http.tls.certresolver=letsencrypt
-      - --entryPoints.https-ext.http.middlewares=static-app-errorpages@docker
 
       # Necessary for routing to back-ends with self-signed SSL certificates
       #- --serversTransport.insecureSkipVerify=true
@@ -85,14 +81,7 @@ services:
         - "traefik.http.services.traefik-app.loadbalancer.server.port=8080"
         - "traefik.http.routers.traefik-app.entrypoints=https"
         - "traefik.http.routers.traefik-app.service=api@internal"
-        - "traefik.http.routers.traefik-app.middlewares=static-app-errorpages"
 
-        # Reusable middlewares
-
-        - "traefik.http.middlewares.static-app-errorpages.errors.status=400,401,403,404,409,500"
-        - "traefik.http.middlewares.static-app-errorpages.errors.service=static-app"
-        - "traefik.http.middlewares.static-app-errorpages.errors.query=/{status}.html"
-        
         #- "traefik.http.middlewares.internal-only.ipwhitelist.sourcerange=127.0.0.1/32, ${DOMAIN_CIDR}"
 
         #- "traefik.http.middlewares.reqAuth.forwardauth.address=https://auth.${DOMAIN}"

@@ -16,10 +16,6 @@ services:
         - "traefik.http.routers.static-app.rule=Host(`static.${DOMAIN}`) || Host(`www.${DOMAIN}`) || Host(`${DOMAIN}`)"
         #- "traefik.http.routers.static-app.rule=HostRegexp(`{host:.+}`)"
         #- "traefik.http.routers.static-app.priority=1"
-        #- "traefik.http.routers.static-app.middlewares=static-app-errorpages"
-        #- "traefik.http.middlewares.static-app-errorpages.errors.status=400,401,403,404,409,500"
-        #- "traefik.http.middlewares.static-app-errorpages.errors.service=static-app"
-        #- "traefik.http.middlewares.static-app-errorpages.errors.query=/{status}.html"
 
 networks:
   proxy:
