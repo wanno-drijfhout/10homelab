@@ -30,6 +30,16 @@
     - docker-ce-cli
     - containerd.io
 
+- name: Docker daemon configured
+  # We'll need to configure the Docker daemon explicitly to
+  # - use its internal `docker_gwbridge` network to connect to the pihole we'll deploy later. Docker usually extracts this information from the host's `/etc/resolve.conf`, but this depends on external configuration that's not always correct
+  template:
+    src: daemon.json.j2
+    dest: /etc/docker/daemon.json
+    owner: root
+    group: root
+    mode: 0644
+
 - name: Docker running at boot
   service:
     name: docker

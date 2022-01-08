@@ -63,17 +63,6 @@ Disconnect
 - Run `userdel -r newuser` (*you may have to kill running processes first*)
 - Run `apt upgrade`
 
-## Configure Docker engine
-
-We'll need to configure the Docker explicitly in `/etc/docker/daemon.json` to use its internal `docker_gwbridge` network to connect to the pihole we'll deploy later. Docker usually extracts this information from the host's `/etc/resolve.conf`, but this breaks isolation and doesn't always work properly.
-
-```json
-{
-  "dns": [ "172.18.0.1" ],
-  "dns-search": [ "<<example.org>>", "fritz.box" ]
-}
-```
-
 ## Finalize Virtual Machine
 
 Run on drone:
