@@ -53,6 +53,8 @@
     image: hello-world
     detach: false
     cleanup: true
+    log_driver: json-file
+    output_logs: yes
   register: this
   changed_when: false
   failed_when: "'Hello from Docker!' not in this.container.Output"
