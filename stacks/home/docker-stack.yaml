@@ -53,7 +53,7 @@ services:
     environment:
       - TZ=Europe/Amsterdam
     networks:
-      #- proxy
+      - proxy
       - default
     deploy:
       replicas: 1
@@ -61,10 +61,10 @@ services:
         constraints:
           - node.role == manager
       labels:
-        - "traefik.enabled=false"
-        # - "traefik.http.routers.home-mosquitto.entrypoints=https,https-ext"
-        # - "traefik.http.services.home-mosquitto.loadbalancer.server.port=1883"
-        # - "traefik.http.routers.home-mosquitto.rule=Host(`mqtt.${DOMAIN}`) || Host(`mosquitto.${DOMAIN}`)"
+        - "traefik.tcp.routers.home-mosquitto.entrypoints=mqtts,mqtts-ext"
+        - "traefik.tcp.routers.home-mosquitto.tls=true"
+        - "traefik.tcp.services.home-mosquitto.loadbalancer.server.port=1883"
+        - "traefik.tcp.routers.home-mosquitto.rule=HostSNI(`home.${DOMAIN}`)"
 
   esphome:
     image: esphome/esphome

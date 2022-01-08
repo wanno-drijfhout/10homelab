@@ -42,6 +42,12 @@ services:
       - --entryPoints.https-ext.address=:44443
       - --entryPoints.https-ext.http.tls.certresolver=letsencrypt
 
+      - --entryPoints.mqtts.address=:8883
+      - --entryPoints.mqtts.http.tls.certresolver=letsencrypt
+      
+      - --entryPoints.mqtts-ext.address=:44883
+      - --entryPoints.mqtts-ext.http.tls.certresolver=letsencrypt
+
       # Necessary for routing to back-ends with self-signed SSL certificates
       #- --serversTransport.insecureSkipVerify=true
     ports:
@@ -63,6 +69,14 @@ services:
         mode: host
       - target: 44443
         published: 44443  # https-ext
+        protocol: tcp
+        mode: host
+      - target: 8883
+        published: 8883   # mqtts
+        protocol: tcp
+        mode: host
+      - target: 44883
+        published: 44883  # mqtts-ext
         protocol: tcp
         mode: host
     volumes:
