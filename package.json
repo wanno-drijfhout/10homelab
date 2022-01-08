@@ -6,7 +6,7 @@
         "doc": "docs"
     },
     "dependencies": {
-        "docsify": "^4.12.1"
+        "docsify": "^4.12.2"
     },
     "devDependencies": {
         "docsify-cli": "^4.4.3"

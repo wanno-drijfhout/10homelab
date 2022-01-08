@@ -81,7 +81,7 @@ services:
         - "traefik.enable=false"
 
   db:
-    image: postgres
+    image: postgres:13
     networks:
       - default
     volumes:
