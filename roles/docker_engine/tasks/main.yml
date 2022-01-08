@@ -33,6 +33,7 @@
 - name: Docker daemon configured
   # We'll need to configure the Docker daemon explicitly to
   # - use its internal `docker_gwbridge` network to connect to the pihole we'll deploy later. Docker usually extracts this information from the host's `/etc/resolve.conf`, but this depends on external configuration that's not always correct
+  # - to use the 'local' log driver (https://docs.docker.com/config/containers/logging/configure/) to avoid infinitely growing log files
   template:
     src: daemon.json.j2
     dest: /etc/docker/daemon.json
