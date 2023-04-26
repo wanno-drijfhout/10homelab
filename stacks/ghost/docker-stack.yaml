@@ -1,0 +1,31 @@
+version: '3.6'
+services:
+  app:
+    image: ghost:5
+    environment:
+      - url=https://wanno.eu
+      - database__client=sqlite3
+      - database__connection__filename="content/data/ghost.db"
+      - database__useNullAsDefault=true
+      - database__debug=false
+    volumes:
+      - data:/var/lib/ghost/content
+    networks:
+      - proxy
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+      labels:
+        - "traefik.http.routers.${XYZ}-ghost-app.entrypoints=https-ext,https"
+        - "traefik.http.services.${XYZ}-ghost-app.loadbalancer.server.port=2368"
+        #- "traefik.http.routers.${XYZ}-ghost-app.rule=Host(`${YOUR-PERSONAL-DOMAIN}`)"
+
+networks:
+  proxy:
+    name: proxy
+    external: true
+    
+volumes:
+  data:
