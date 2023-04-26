@@ -1,0 +1,30 @@
+version: '3.6'
+services:
+  app:
+    image: toluclassics/transformers_notebook
+    volumes:
+      - default:/home/jovyan/.jupyter
+      - data:/home/jovyan/work
+    networks:
+      - proxy
+    environment:
+      - JUPYTER_ENABLE_LAB=yes
+      - NB_UID=1000
+      - NB_GID=1000
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+      labels:
+        - "traefik.http.routers.${XYZ}-jupyterlab-app.entrypoints=https-ext,https"
+        - "traefik.http.services.${XYZ}-jupyterlab-app.loadbalancer.server.port=8888"
+
+networks:
+  proxy:
+    name: proxy
+    external: true
+    
+volumes:
+  default:
+  data:
