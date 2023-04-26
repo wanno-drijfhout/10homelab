@@ -6,10 +6,10 @@
         "doc": "docs"
     },
     "dependencies": {
-        "docsify": "^4.12.2"
+        "docsify": "^4.13.0"
     },
     "devDependencies": {
-        "docsify-cli": "^4.4.3"
+        "docsify-cli": "^4.4.4"
     },
     "scripts": {
         "serve": "start http://localhost:3000 && docsify serve",
