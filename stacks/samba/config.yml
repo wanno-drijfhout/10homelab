@@ -1,0 +1,26 @@
+auth:
+  - user: root
+    group: root
+    uid: 0
+    gid: 0
+    password_file: /run/secrets/samba_root_password
+
+global:
+  - "force user = root"
+  - "force group = root"
+
+share:
+  - name: public
+    comment: Public share
+    path: /srv/samba/public
+    browsable: yes
+    readonly: yes
+    guestok: yes
+  - name: home
+    comment: Internal home share
+    path: /srv/samba/home
+    browsable: yes
+    readonly: no
+    guestok: no
+    validusers: root
+    writelist: root
