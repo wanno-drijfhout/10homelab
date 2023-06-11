@@ -1,0 +1,52 @@
+version: "3.5"
+
+services:
+  samba:
+    image: crazymax/samba
+    ports:
+      # CIFS / SMB over TCP
+      - target: 445
+        published: 445
+        protocol: tcp
+        mode: host
+    volumes:
+      # Manually create folders "public" and "home" in /srv/samba; see config.yml.
+      - data:/srv/samba
+    environment:
+      - "TZ=Europe/Amsterdam"
+      - "SAMBA_SERVER_STRING=Keizerlijke Opslag"
+      #- "SAMBA_LOG_LEVEL=3 passdb:5 auth:10 winbind:2"
+      - "SAMBA_LOG_LEVEL=0"
+    secrets:
+      - samba_root_password
+    #restart: always
+    networks:
+      - proxy
+    configs:
+      - source: config.yml
+        target: /data/config.yml
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+      labels:
+        - "traefik.http.routers.${XYZ}-samba-app.entrypoints="
+        #- "traefik.http.services.${XYZ}-samba-app.loadbalancer.server.port=80"
+        #- "traefik.http.routers.${XYZ}-samba-app.rule=Host(`${YOUR-PERSONAL-DOMAIN}`)"
+
+networks:
+  proxy:
+    name: proxy
+    external: true
+    
+configs:
+  config.yml:
+    file: /data/config.yml
+
+secrets:
+  samba_home_password:
+    external: true
+
+volumes:
+  data:
