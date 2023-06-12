@@ -22,6 +22,10 @@ services:
       labels:
         - "traefik.http.routers.portainer-app.entrypoints=https"
         - "traefik.http.services.portainer-app.loadbalancer.server.port=9000"
+      resources:
+        reservations:
+          cpus: '1'
+          memory: 128M
 
   agent:
     image: portainer/agent
