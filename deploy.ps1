@@ -2,6 +2,7 @@ $dirPath = ($PSCommandPath | Split-Path -Parent).ToString()
 $dirName = ($dirPath | Split-Path -Leaf).ToString()
 $to = "root@10.69.1.10:~/${dirName}"
 
+echo "Copying ${dirPath}/[!.]* to ${to}..."
 # Note that deleting everything will also delete SECRETS
 #ssh $to "rm -rf ${dirName}"
 

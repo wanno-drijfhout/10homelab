@@ -31,6 +31,10 @@ services:
         #- "traefik.http.middlewares.nextcloud-wellknown.replacepathregex.replacement=/index.php$${1}"
         #- "traefik.http.routers.nextcloud-app.middlewares=nextcloud-dav, nextcloud-wellknown"
         - "traefik.http.routers.nextcloud-app.middlewares=nextcloud-dav"
+      resources:
+        reservations:
+          cpus: '1'
+          memory: 128M
     environment:
       - TRUSTED_PROXIES=${DOMAIN_CIDR}
       - APACHE_DISABLE_REWRITE_IP=1

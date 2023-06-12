@@ -101,7 +101,13 @@ services:
         #- "traefik.http.middlewares.reqAuth.forwardauth.address=https://auth.${DOMAIN}"
         #- "traefik.http.middlewares.reqAuth.forwardauth.authResponseHeaders=X-Forwarded-User"
         #- "traefik.http.middlewares.reqAuth.forwardauth.trustForwardHeader=true"
-
+      resources:
+        limits:
+          cpus: '4'
+          memory: 512M
+        reservations:
+          cpus: '1'
+          memory: 128M
     healthcheck:
       test: traefik healthcheck --ping
 
