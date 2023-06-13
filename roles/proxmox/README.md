@@ -29,9 +29,12 @@ lvextend /dev/pve/data /dev/sda3
 Rename `/etc/apt/sources.list.d/pve-enterprise.list` to `pve-no-subscription.list` and replace:
 
 ```
-# deb https://enterprise.proxmox.com/debian buster pve-enterprise
-deb http://download.proxmox.com/debian buster pve-no-subscription
+#deb https://enterprise.proxmox.com/debian/pve bullseye pve-enterprise
+deb http://download.proxmox.com/debian/pve bullseye pve-no-subscription
+# Note the http instead of httpS!
 ```
+
+!> See <https://pve.proxmox.com/wiki/Package_Repositories> for updated information.
 
 Then, run:
 
