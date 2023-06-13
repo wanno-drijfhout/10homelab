@@ -58,7 +58,7 @@ Unattended-Upgrade::Mail "root";
 
 ## Create distributed/redundant storage
 
-Install CephFS on the Hypervisor for the sake of RAID 5. Add all disks as OSDs (encrypted).
+Install CephFS via Proxmox for the sake of RAID 5. (Alternative is to run Ceph inside Docker nodes; see [Funky Penguin](https://geek-cookbook.funkypenguin.co.nz/ha-docker-swarm/shared-storage-ceph/) for more info.)
 
 Configure Ceph as [One Node Cluster](https://docs.ceph.com/docs/mimic/rados/troubleshooting/troubleshooting-pg/#one-node-cluster):
 
@@ -70,10 +70,6 @@ Configure Ceph as [One Node Cluster](https://docs.ceph.com/docs/mimic/rados/trou
 osd_crush_chooseleaf_type = 0
 ```
 
-The approach below will install Ceph via Proxmox. Alternative is to run Ceph inside Docker nodes; see [Funky Penguin](https://geek-cookbook.funkypenguin.co.nz/ha-docker-swarm/shared-storage-ceph/) for more info.
-
-- Create one OSD per (4TB) data hard disk with **Encrypt OSD** checked
-
 > If you created OSDs too early, you may need to repair `type host` to `type osd` in the crushmap according to [these instructions](https://linoxide.com/linux-how-to/hwto-configure-single-node-ceph-cluster/). This allows replication to any other osd (regardless of host).
 
 - Create an Metadata Server.
@@ -81,3 +77,5 @@ The approach below will install Ceph via Proxmox. Alternative is to run Ceph ins
 - Under Datacenter > Storage, add:
   - Type "RDB", named "distributed-ceph", for images, containers
   - Type "CephFS", named "distributed", for backups, images, snippets, templates
+
+- Create one OSD per (4TB) data hard disk with **Encrypt OSD** checked
