@@ -73,6 +73,8 @@ Configure Ceph as [One Node Cluster](https://docs.ceph.com/docs/mimic/rados/trou
 osd_crush_chooseleaf_type = 0
 ```
 
+- Restart ceph: `systemctl restart ceph.target`
+
 > If you created OSDs too early, you may need to repair `type host` to `type osd` in the crushmap according to [these instructions](https://linoxide.com/linux-how-to/hwto-configure-single-node-ceph-cluster/). This allows replication to any other osd (regardless of host).
 
 - Create an Metadata Server.
@@ -81,4 +83,5 @@ osd_crush_chooseleaf_type = 0
   - Type "RDB", named "distributed-ceph", for images, containers
   - Type "CephFS", named "distributed", for backups, images, snippets, templates
 
-- Create one OSD per (4TB) data hard disk with **Encrypt OSD** checked
+- Create one OSD per (4TB) data hard disk with **Encrypt OSD** *un*checked. If there's ever a problem with data corruption (been there), you don't want to lose all your data because the encryption keys are lost. (Ceph stores these in the "monitors")
+- Create additional monitors on other hosts (if possible), following the official advice "Additional monitors are recommended. They can be created at any time in the Monitor tab."
