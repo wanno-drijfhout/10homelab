@@ -72,10 +72,15 @@ Configure Ceph as [One Node Cluster](https://docs.ceph.com/docs/mimic/rados/trou
 ...
 osd_crush_chooseleaf_type = 0
 ```
+- We need to change `type host` to `type osd` in the crushmap line `step chooseleaf firstn 0 type host`. This allows replication to any other osd (regardless of host). Run the following to do so automatically:
 
-- Restart ceph: `systemctl restart ceph.target`
-
-> If you created OSDs too early, you may need to repair `type host` to `type osd` in the crushmap according to [these instructions](https://linoxide.com/linux-how-to/hwto-configure-single-node-ceph-cluster/). This allows replication to any other osd (regardless of host).
+```sh
+ceph osd getcrushmap -o crush_map_compressed
+crushtool -d crush_map_compressed -o crush_map_decompressed
+sed -i 's/step chooseleaf firstn 0 type host/step chooseleaf firstn 0 type osd/' crush_map_decompressed
+crushtool -c crush_map_decompressed -o new_crush_map_compressed
+ceph osd setcrushmap -i new_crush_map_compressed
+```
 
 - Create an Metadata Server.
 - Create a CephFS
