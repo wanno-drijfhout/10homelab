@@ -13,7 +13,7 @@ Install on the SSD.
 Use network settings:
 
 - FQDN: `<host>.<domain>` (*Note: this is the DHCP domain; e.g., `fritz.box`)
-- IP address: `10.<<XX>>.1.20`
+- IP address: `10.<<XX>>.1.10/16`
 - Netmask: `255.255.0.0`
 - Gateway: `10.<<XX>>.1.1`
 - DNS Server: `10.<<XX>>.1.1` (*Note: this is the DHCP server IP; e.g., the FRITZ!Box)
@@ -71,16 +71,6 @@ osd_crush_chooseleaf_type = 0
 ```
 
 The approach below will install Ceph via Proxmox. Alternative is to run Ceph inside Docker nodes; see [Funky Penguin](https://geek-cookbook.funkypenguin.co.nz/ha-docker-swarm/shared-storage-ceph/) for more info.
-
-- Install Ceph via Proxmox VE
-- Configure Ceph as One Node Cluster:
-  - Add the line to `/etc/ceph/ceph.conf`:
-
-    ```ini
-    [global]
-    ...
-    osd_crush_chooseleaf_type = 0
-    ```
 
 - Create one OSD per (4TB) data hard disk with **Encrypt OSD** checked
 
