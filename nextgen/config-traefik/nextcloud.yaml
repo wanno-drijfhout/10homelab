@@ -1,0 +1,28 @@
+http:
+  routers:
+    nextcloudRouter:
+      entryPoints: ["web-secure"]
+      rule: 'Host(`nextcloud.{{ env "DOMAIN" }}`)'
+      tls:
+        certResolver: le
+      middlewares: ["nextcloud-redirectregex", "nextcloud-redirectregex2"]
+      service: nextcloudService
+
+  middlewares:
+    nextcloud-redirectregex:
+      redirectRegex:
+        permanent: true
+        regex: "https://(.*)/.well-known/(?:card|cal)dav"
+        replacement: "https://${1}/remote.php/dav"
+
+    nextcloud-redirectregex2:
+      redirectRegex:
+        permanent: true
+        regex: "https://(.*)/.well-known/(webfinger|nodeinfo)"
+        replacement: "https://${1}/index.php/.well-known/${2}"
+
+  services:
+    nextcloudService:
+      loadBalancer:
+        servers:
+          - url: 'http://{{ env "HOSTNAME_HA" }}:8082'

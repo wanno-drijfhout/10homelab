@@ -1,0 +1,56 @@
+http:
+  routers:
+    redirectToHttpsRouter:
+      entryPoints: ["web"]
+      rule: "HostRegexp(`{host:.+}`)"
+      middlewares: ["httpsRedirect"]
+      service: noop@internal
+
+    homeAssistantRouter:
+      entryPoints: ["web-secure"]
+      tls:
+        certResolver: le
+      rule: "Host(`home.<DOMAIN>`)"
+      service: homeAssistantService
+
+    nextcloudRouter:
+      entryPoints: ["web-secure"]
+      rule: "Host(`nextcloud.<DOMAIN>`)"
+      tls:
+        certResolver: le
+      middlewares: ["nextcloud-redirectregex"]
+      service: nextcloudService
+
+    portainerRouter:
+      entryPoints: ["web-secure"]
+      rule: "Host(`portainer.<DOMAIN>`)"
+      tls:
+        certResolver: le
+      service: portainerService
+
+  middlewares:
+    httpsRedirect:
+      redirectScheme:
+        scheme: https
+
+    nextcloud-redirectregex:
+      redirectRegex:
+        permanent: true
+        regex: "https://(.*)/.well-known/(?:card|cal)dav"
+        replacement: "https://${1}/remote.php/dav"
+
+  services:
+    homeAssistantService:
+      loadBalancer:
+        servers:
+          - url: "http://<HOMEASSISTANT-HOST>.local:8123"
+
+    nextcloudService:
+      loadBalancer:
+        servers:
+          - url: "http://<HOMEASSISTANT-HOST>.local:8082"
+
+    portainerService:
+      loadBalancer:
+        servers:
+          - url: "http://<HOMEASSISTANT-HOST>.local:9000"

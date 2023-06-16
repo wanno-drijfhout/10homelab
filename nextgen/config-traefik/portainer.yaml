@@ -1,0 +1,14 @@
+http:
+  routers:
+    portainerRouter:
+      entryPoints: ["web-secure"]
+      rule: 'Host(`portainer.{{ env "DOMAIN" }}`)'
+      tls:
+        certResolver: le
+      service: portainerService
+
+  services:
+    portainerService:
+      loadBalancer:
+        servers:
+          - url: 'http://{{ env "HOSTNAME_HA" }}:9000'

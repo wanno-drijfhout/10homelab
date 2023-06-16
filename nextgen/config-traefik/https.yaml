@@ -1,0 +1,12 @@
+http:
+  routers:
+    redirectToHttpsRouter:
+      entryPoints: ["web"]
+      rule: "HostRegexp(`{host:.+}`)"
+      middlewares: ["httpsRedirect"]
+      service: noop@internal
+
+  middlewares:
+    httpsRedirect:
+      redirectScheme:
+        scheme: https

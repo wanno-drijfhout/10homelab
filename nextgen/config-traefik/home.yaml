@@ -1,0 +1,14 @@
+http:
+  routers:
+    homeAssistantRouter:
+      entryPoints: ["web-secure"]
+      tls:
+        certResolver: le
+      rule: 'Host(`home.{{ env "DOMAIN" }}`)'
+      service: homeAssistantService
+
+  services:
+    homeAssistantService:
+      loadBalancer:
+        servers:
+          - url: 'http://{{ env "HOSTNAME_HA" }}:8123'
